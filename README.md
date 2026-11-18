@@ -21,6 +21,87 @@ You design every part in the Webflow Designer with your own classes. One site-wi
 - **Late-loading items:** items added after the page loads (by Finsweet List Load, for example) are picked up and filtered automatically.
 - **Equal card heights (optional):** extra wrapped lines come out of the card's photo instead of making the card taller.
 
+## Quick start: build a bar on one page
+
+These steps get one bar working on one page. The sections after this one cover every attribute and option in more detail.
+
+### Step 1: Add the script to the page
+
+1. In the **Pages** panel, hover over the page and click its **gear icon**.
+2. Scroll to **Custom Code**.
+3. In **Before `</body>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
+4. Save.
+
+Use the Before `</body>` field, not the head field. You need a paid site plan for custom code.
+
+### Step 2: Build the bar
+
+Every attribute goes in **Element settings**, under **Custom attributes**. Where the value doesn't matter, use `true`. Pick a **group name** first, for example `advisors`.
+
+**The bar**
+1. Add a **Div Block** and give it your class.
+2. Add `data-filter-bar` = `advisors`.
+3. Optional: add `data-filter-label` = `Filter advisors by state` for screen readers.
+
+**The search field (optional)**
+1. Inside the bar, add a **Form Block**.
+2. Delete the submit button and the success and error messages.
+3. Style the **Input** with your class.
+4. On the Input, add `data-filter-search` = `true`.
+
+**The options track**
+1. Inside the bar, add a **Div Block** for the track.
+2. Style it with your class. Its **padding** is the space around the thumb, and its flex and wrap settings decide how the options lay out.
+3. Add `data-filter-options` = `true`.
+
+**The "All" option**
+1. Inside the track, add a **Button** and type **All**.
+2. Style it as an **inactive** option: padding, font, idle text color and breakpoints. Every other option is copied from it.
+3. Add `data-filter-option` = `true`.
+4. If you use a Link Block with a Text Block inside instead, add `data-filter-option-label` = `true` to the Text Block.
+
+**The thumb**
+1. Inside the track, add an empty **Div Block**.
+2. Style only its **background color**, **text color** (the active label color) and **corner radius**.
+3. Add `data-filter-thumb` = `true`.
+
+### Step 3: Count and empty message (optional)
+
+These can go anywhere on the page.
+
+| Element | Attributes |
+|---|---|
+| Text Block for the count | `data-filter-status` = `advisors` and `data-filter-noun` = `advisor` |
+| Any element for "no matches" | `data-filter-empty` = `advisors` |
+
+### Step 4: Connect your items
+
+| Attribute | Goes on |
+|---|---|
+| `data-filter-item` = `advisors` | Each **Collection Item** in your grid |
+| `data-filter-value` = `true` | Each value to filter by, like a state name. For a multi-reference field, use a nested Collection List with a Text bound to Name, hidden with display: none. |
+| `data-filter-search-text` = `true` (optional) | The texts search should look at. Without it, search looks at all of the item's text. |
+
+### Step 5: Optional settings on the bar
+
+| Attribute | What it does | Default |
+|---|---|---|
+| `data-filter-sort` = `cms` | Keeps your CMS order | A to Z |
+| `data-filter-duration` | Animation length in ms. `0` turns it off. | `420` |
+| `data-filter-squash` | Thumb overshoot in px | `3` |
+
+### Step 6: Publish and test
+
+Publish to your **webflow.io staging** domain, since custom code doesn't run in the Designer or Preview mode. Then check:
+
+- [ ] The options show All, then your values.
+- [ ] Tapping or dragging moves the thumb and filters the items.
+- [ ] Search filters as you type, and Enter doesn't reload the page.
+- [ ] The count updates, and the empty message shows only when nothing matches.
+- [ ] Tab and the arrow keys move between the options.
+- [ ] With Reduce Motion on, the thumb jumps with no animation.
+- [ ] The layout holds at 320px, 768px and desktop.
+
 ## Install
 
 Pick one place. The script is about 15,000 characters, and both fields allow 50,000.
