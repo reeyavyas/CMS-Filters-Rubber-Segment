@@ -59,6 +59,8 @@ Pick a **group name** first, for example `advisors`. It ties a bar to its items,
 2. Style it with your class. Its **padding** is the space between the thumb and the track's edge, and its flex and wrap settings decide how the options lay out.
 3. Add `data-filter-options` = `true`.
 
+Don't bind the track to the CMS. The script adds one option for each value you tag in [Step 4](#step-4-connect-your-items).
+
 **The "All" option**
 1. Inside the track, add a **Button** (or a Link Block or Div) and type **All**.
 2. Style it as an **inactive** option: padding, font, idle text color and breakpoints. Every other option is copied from it.
