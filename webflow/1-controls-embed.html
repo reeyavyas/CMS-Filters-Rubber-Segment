@@ -51,6 +51,10 @@
   .rs-thumb span { color: var(--af-navy); }
   .af-status { margin: 24px 0 16px; font-size: 15px; color: var(--af-idle-text); }
   .af-empty { margin: 0 0 16px; font-size: 17px; color: var(--af-white); }
+  /* Desktop (wider than iPad landscape): more side padding so the filters take up more of the bar */
+  @media (min-width: 1025px) {
+    .rs button, .rs-thumb span { padding-left: 48px; padding-right: 48px; }
+  }
   /* Stack below 720px so the row never wraps half-way (iPad portrait at 768px keeps one row) */
   @media (max-width: 719px) {
     .af-search { flex-basis: 100%; width: auto; max-width: none; padding: var(--af-inset) var(--af-inset) 0; }

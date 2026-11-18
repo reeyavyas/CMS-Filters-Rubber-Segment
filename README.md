@@ -17,7 +17,7 @@ The people and phone numbers in the prototype are fictional (555-01xx numbers).
 ## How it behaves
 
 - **Search** matches names, titles and office cities as you type, and works together with the state filter.
-- **Filters** size to their label plus padding: 8px top and bottom, and 24px left and right on desktop and iPad. On phones, each line splits its space evenly between the filters.
+- **Filters** size to their label plus padding: 8px top and bottom, 24px left and right on iPad, and 48px left and right on desktop (wider than 1024px). On phones, each line splits its space evenly between the filters.
 - **Wrapping:** when there are too many states to fit, the filters wrap onto another line, and the thumb stretches between lines.
 - **Keyboard:** Tab reaches the segment, and the arrow keys, Home and End move between filters.
 - **Layout:** on desktop and iPad, the bar runs full width, with search on the left (capped at 400px) and filters on the right. Below 720px, search sits on top and the filters sit underneath.

@@ -97,6 +97,11 @@
   .card-footer .home, .card-footer .also { display: block; font-size: 18px; font-weight: 600; }
   .card-footer .also { margin-top: var(--space-1); }
 
+  /* Desktop (wider than iPad landscape): more side padding so the filters take up more of the bar */
+  @media (min-width: 1025px) {
+    .rs button, .rs-thumb span { padding-left: var(--space-7); padding-right: var(--space-7); }
+  }
+
   /* Stack below 720px so the row never wraps half-way (iPad portrait at 768px keeps one row) */
   @media (max-width: 719px) {
     .search { flex-basis: 100%; width: auto; max-width: none; padding: var(--inset) var(--inset) 0; }
