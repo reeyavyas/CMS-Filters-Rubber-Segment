@@ -129,13 +129,6 @@
     </div>
   </div>
 
-  <!-- Stand-in for the hidden States Collection List Webflow renders -->
-  <div class="w-dyn-list" hidden><div role="list" class="w-dyn-items">
-    <div role="listitem" class="w-dyn-item"><div data-state-option>Indiana</div></div>
-    <div role="listitem" class="w-dyn-item"><div data-state-option>Kentucky</div></div>
-    <div role="listitem" class="w-dyn-item"><div data-state-option>Tennessee</div></div>
-  </div></div>
-
   <p class="status" id="resultsStatus" role="status"></p>
   <p class="empty" id="emptyState" hidden>No advisors match. Try a different name, city or state.</p>
 
@@ -224,9 +217,10 @@
 <script>
 (() => {
   const seg = document.getElementById('stateFilter');
-  // One slot per state, read from the hidden States Collection List ([data-state-option]); "All" stays first
+  // One slot per state that at least one advisor has (the cards' [data-state] text), A to Z; "All" stays first
   const slotRow = seg.querySelector('.rs-slots:not(.rs-thumb)'), thumbRow = seg.querySelector('.rs-thumb');
-  const stateNames = [...new Set([...document.querySelectorAll('[data-state-option]')].map(e => e.textContent.trim()).filter(Boolean))];
+  const stateNames = [...new Set([...document.querySelectorAll('[data-advisor] [data-state]')].map(e => e.textContent.trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
   for (const name of stateNames) {
     const b = document.createElement('button');
     b.type = 'button'; b.textContent = name; b.tabIndex = -1; b.dataset.value = name;

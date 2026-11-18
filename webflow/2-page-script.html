@@ -3,9 +3,10 @@
 (() => {
   const seg = document.getElementById('stateFilter');
   if (!seg) return;
-  // One slot per state, read from the hidden States Collection List ([data-state-option]); "All" stays first
+  // One slot per state that at least one advisor has (the cards' [data-state] text), A to Z; "All" stays first
   const slotRow = seg.querySelector('.rs-slots:not(.rs-thumb)'), thumbRow = seg.querySelector('.rs-thumb');
-  const stateNames = [...new Set([...document.querySelectorAll('[data-state-option]')].map(e => e.textContent.trim()).filter(Boolean))];
+  const stateNames = [...new Set([...document.querySelectorAll('[data-advisor] [data-state]')].map(e => e.textContent.trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
   for (const name of stateNames) {
     const b = document.createElement('button');
     b.type = 'button'; b.textContent = name; b.tabIndex = -1; b.dataset.value = name;
