@@ -21,13 +21,28 @@ You design every part in the Webflow Designer with your own classes. One site-wi
 - **Late-loading items:** items added after the page loads (by Finsweet List Load, for example) are picked up and filtered automatically.
 - **Equal card heights (optional):** extra wrapped lines come out of the card's photo instead of making the card taller.
 
-## Install once, for the whole site
+## Install
+
+Pick one place. The script is about 15,000 characters, and both fields allow 50,000.
+
+### One page
+
+1. In the **Pages** panel, hover over the page and click its **gear icon**.
+2. Scroll to **Custom Code**.
+3. In **Before `</body>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
+4. Save and publish.
+
+Use "Before `</body>` tag," not "Inside `<head>` tag," because the bar and items need to be on the page when the script runs. On a CMS template page, it runs for every item that uses the template. Each page with a bar needs its own copy.
+
+### The whole site
 
 1. Open **Site settings**, then **Custom code**, then **Footer code**.
 2. Type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 3. Save and publish.
 
-The script is about 15,000 characters. The Footer code field allows 50,000. On pages with no filter bar, it does nothing.
+On pages with no filter bar, it does nothing.
+
+**Moving from page to site later:** add it to Site settings, then delete it from each page. Leaving both won't break anything, because the script skips a bar it has already set up, but it would load twice.
 
 ## Build a bar in the Designer
 
@@ -150,7 +165,7 @@ Check that nested Collection Lists (like states inside each item) come through o
 
 | What you see | Likely cause |
 |---|---|
-| Nothing happens | The script isn't in Footer code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
+| Nothing happens | The script isn't in Footer code or the page's Before `</body>` field, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
 | Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
 | The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
