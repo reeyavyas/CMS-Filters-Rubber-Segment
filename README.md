@@ -2,13 +2,13 @@
 
 A reusable filter bar for Webflow: a search field and a rubber segmented control that filter any CMS Collection List. Use it for advisors by state, events by type, articles by topic, or anything else, on any page, as many times as you like.
 
-You design every part in the Webflow Designer with your own classes. One site-wide script adds the behavior. It finds each bar through custom attributes, so no design values live in the code.
+You design every part in the Webflow Designer with your own classes. One script adds the behavior. It finds each bar through custom attributes, so no design values live in the code.
 
 ## What's in here
 
 | File | What it is |
 |---|---|
-| `webflow/filter-bar.js` | The whole component. Paste it once into Site settings, wrapped in a script tag. |
+| `webflow/filter-bar.js` | The whole component. Paste it into Webflow, wrapped in a script tag. |
 | `demo.html` | Two working bars (advisors by state, and events by type) with made-up sample data. Its `<style>` block stands in for the classes you build in Webflow. |
 
 ## How it behaves
@@ -21,9 +21,11 @@ You design every part in the Webflow Designer with your own classes. One site-wi
 - **Late-loading items:** items added after the page loads (by Finsweet List Load, for example) are picked up and filtered automatically.
 - **Equal card heights (optional):** extra wrapped lines come out of the card's photo instead of making the card taller.
 
-## Quick start: build a bar on one page
+## Build a bar
 
-These steps get one bar working on one page. The sections after this one cover every attribute and option in more detail.
+These steps get a bar working on one page. To use it across the whole site instead, see [Use it on the whole site](#use-it-on-the-whole-site).
+
+Every attribute goes in **Element settings**, under **Custom attributes**. Where the value doesn't matter, use `true`.
 
 ### Step 1: Add the script to the page
 
@@ -32,63 +34,77 @@ These steps get one bar working on one page. The sections after this one cover e
 3. In **Before `</body>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 4. Save.
 
-Use the Before `</body>` field, not the head field. You need a paid site plan for custom code.
+- **Use the Before `</body>` field, not the head field.** The bar and items need to be on the page when the script runs.
+- **Plan and size:** you need a paid site plan for custom code. The script is about 15,000 characters, and the field allows 50,000.
+- **CMS template pages:** the script runs for every item that uses the template.
+- **Other pages:** each page with a bar needs its own copy.
 
 ### Step 2: Build the bar
 
-Every attribute goes in **Element settings**, under **Custom attributes**. Where the value doesn't matter, use `true`. Pick a **group name** first, for example `advisors`.
+Pick a **group name** first, for example `advisors`. It ties a bar to its items, count and empty message, so two bars on one page never interfere.
 
 **The bar**
 1. Add a **Div Block** and give it your class.
 2. Add `data-filter-bar` = `advisors`.
-3. Optional: add `data-filter-label` = `Filter advisors by state` for screen readers.
+3. Optional: add `data-filter-label` = `Filter advisors by state`. This is what screen readers announce.
 
 **The search field (optional)**
 1. Inside the bar, add a **Form Block**.
 2. Delete the submit button and the success and error messages.
 3. Style the **Input** with your class.
-4. On the Input, add `data-filter-search` = `true`.
+4. On the Input, add `data-filter-search` = `true`. Pressing Enter won't submit the form.
 
 **The options track**
 1. Inside the bar, add a **Div Block** for the track.
-2. Style it with your class. Its **padding** is the space around the thumb, and its flex and wrap settings decide how the options lay out.
+2. Style it with your class. Its **padding** is the space between the thumb and the track's edge, and its flex and wrap settings decide how the options lay out.
 3. Add `data-filter-options` = `true`.
 
 **The "All" option**
-1. Inside the track, add a **Button** and type **All**.
+1. Inside the track, add a **Button** (or a Link Block or Div) and type **All**.
 2. Style it as an **inactive** option: padding, font, idle text color and breakpoints. Every other option is copied from it.
 3. Add `data-filter-option` = `true`.
-4. If you use a Link Block with a Text Block inside instead, add `data-filter-option-label` = `true` to the Text Block.
+4. If the label sits in a Text Block inside a Link Block, add `data-filter-option-label` = `true` to the Text Block.
 
 **The thumb**
 1. Inside the track, add an empty **Div Block**.
-2. Style only its **background color**, **text color** (the active label color) and **corner radius**.
+2. Style only its **background color**, **text color** (the active label color) and **corner radius**. The script handles its size, position and layout.
 3. Add `data-filter-thumb` = `true`.
 
 ### Step 3: Count and empty message (optional)
 
 These can go anywhere on the page.
 
-| Element | Attributes |
-|---|---|
-| Text Block for the count | `data-filter-status` = `advisors` and `data-filter-noun` = `advisor` |
-| Any element for "no matches" | `data-filter-empty` = `advisors` |
+| Element | Attribute | What it does |
+|---|---|---|
+| Text Block for the count | `data-filter-status` = `advisors` | Shows the count, for example "3 advisors in Kentucky" |
+| Same Text Block | `data-filter-noun` = `advisor` | The word for one item |
+| Same Text Block (optional) | `data-filter-noun-plural` | The word for many, if it isn't the noun plus "s" |
+| Any element for "no matches" | `data-filter-empty` = `advisors` | Shown only when nothing matches |
 
 ### Step 4: Connect your items
 
+Your Collection List, grid and cards stay yours. Add these:
+
 | Attribute | Goes on |
 |---|---|
-| `data-filter-item` = `advisors` | Each **Collection Item** in your grid |
-| `data-filter-value` = `true` | Each value to filter by, like a state name. For a multi-reference field, use a nested Collection List with a Text bound to Name, hidden with display: none. |
-| `data-filter-search-text` = `true` (optional) | The texts search should look at. Without it, search looks at all of the item's text. |
+| `data-filter-item` = `advisors` | Each **Collection Item** (the grid's direct child, not the card inside it) |
+| `data-filter-value` = `true` | Each value the item belongs to, like a state or category. For a multi-reference field, use a nested Collection List with a Text bound to Name. For an Option or text field, bind one Text. Hide them with display: none if they shouldn't show. |
+| `data-filter-search-text` = `true` (optional) | Each text search should look at. Without it, search looks at all of the item's text. |
+
+Let the grid place items automatically. If you pin items to specific cells, hidden items leave holes.
 
 ### Step 5: Optional settings on the bar
 
+Add these to the bar element:
+
 | Attribute | What it does | Default |
 |---|---|---|
-| `data-filter-sort` = `cms` | Keeps your CMS order | A to Z |
-| `data-filter-duration` | Animation length in ms. `0` turns it off. | `420` |
-| `data-filter-squash` | Thumb overshoot in px | `3` |
+| `data-filter-sort` = `cms` | Keeps the order values first appear in your list | A to Z |
+| `data-filter-duration` | Thumb animation length in ms. `0` turns the animation off. | `420` |
+| `data-filter-squash` | How far the thumb overshoots before settling, in px | `3` |
+| `data-filter-field` | A field name, like `state`, for [two bars on one list](#two-bars-on-one-list) | All `data-filter-value` text |
+
+**Focus ring:** on the bar's class, add the custom properties `--filter-focus` (color) and `--filter-focus-offset`. Without them, it uses the current text color, 2px out.
 
 ### Step 6: Publish and test
 
@@ -102,112 +118,17 @@ Publish to your **webflow.io staging** domain, since custom code doesn't run in 
 - [ ] With Reduce Motion on, the thumb jumps with no animation.
 - [ ] The layout holds at 320px, 768px and desktop.
 
-## Install
+## Use it on the whole site
 
-Pick one place. The script is about 15,000 characters, and both fields allow 50,000.
-
-### One page
-
-1. In the **Pages** panel, hover over the page and click its **gear icon**.
-2. Scroll to **Custom Code**.
-3. In **Before `</body>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
-4. Save and publish.
-
-Use "Before `</body>` tag," not "Inside `<head>` tag," because the bar and items need to be on the page when the script runs. On a CMS template page, it runs for every item that uses the template. Each page with a bar needs its own copy.
-
-### The whole site
+Instead of Step 1, paste the script once for every page:
 
 1. Open **Site settings**, then **Custom code**, then **Footer code**.
 2. Type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 3. Save and publish.
 
-On pages with no filter bar, it does nothing.
+On pages with no filter bar, it does nothing. Steps 2 to 6 stay the same on each page with a bar.
 
 **Moving from page to site later:** add it to Site settings, then delete it from each page. Leaving both won't break anything, because the script skips a bar it has already set up, but it would load twice.
-
-## Build a bar in the Designer
-
-Every custom attribute below goes in **Element settings**, under **Custom attributes**. Where the value doesn't matter, use `true`.
-
-Each bar has a **group name**, like `advisors` or `events`. The group name ties a bar to its items, its count and its empty message, so two bars on one page never interfere.
-
-### 1. The bar
-
-Add a **Div Block** and style it however you like. This is your bar.
-
-| Attribute | Value |
-|---|---|
-| `data-filter-bar` | The group name, for example `advisors` |
-| `data-filter-label` (optional) | What screen readers announce, for example `Filter advisors by state` |
-
-### 2. The search field (optional)
-
-Inside the bar, add a **Form Block** and style its **Input**. Delete the form's submit button. Pressing Enter won't submit the form.
-
-| Attribute | Goes on |
-|---|---|
-| `data-filter-search` | The Input |
-
-### 3. The options track
-
-Inside the bar, add a **Div Block** for the track the options sit in. Its padding sets the gap between the thumb and the track's edge.
-
-| Attribute | Goes on |
-|---|---|
-| `data-filter-options` | The track |
-
-### 4. The "All" option
-
-Inside the track, add a **Button** (or a Link Block or Div) and type **All**. This is the template every other option is copied from, so style it as an inactive option: padding, font, idle text color, and any breakpoint changes.
-
-| Attribute | Goes on |
-|---|---|
-| `data-filter-option` | The All option |
-| `data-filter-option-label` (optional) | A Text Block inside the option, if the label sits inside a Link Block |
-
-### 5. The thumb
-
-Inside the track, add an empty **Div Block**. Give it the thumb's look: **background color**, **text color** (the active label color) and **corner radius**. The script handles its size, position and layout.
-
-| Attribute | Goes on |
-|---|---|
-| `data-filter-thumb` | The thumb |
-
-### 6. The count and empty message (optional)
-
-These can sit anywhere on the page.
-
-| Attribute | Goes on | What it does |
-|---|---|---|
-| `data-filter-status` = group name | A Text Block | Shows the count, for example "3 advisors in Kentucky" |
-| `data-filter-noun` | Same Text Block | The word for one item, for example `advisor` |
-| `data-filter-noun-plural` (optional) | Same Text Block | The word for many, if it isn't the noun plus "s" |
-| `data-filter-empty` = group name | Any element | Shown only when nothing matches |
-
-## Tag your items
-
-Your Collection List, grid and cards stay yours. Add these:
-
-| Attribute | Goes on |
-|---|---|
-| `data-filter-item` = group name | Each **Collection Item** (the grid's direct child, not the card inside it) |
-| `data-filter-value` | Each value the item belongs to, like a state or category. For a multi-reference field, use a nested Collection List with a Text bound to the Name. For an Option or text field, bind one Text. Hide them with display: none if they shouldn't show. |
-| `data-filter-search-text` (optional) | Each text search should look at. With none, search looks at all the item's text. |
-
-Let the grid place items automatically. If you pin items to specific cells, hidden items leave holes.
-
-## Options for each bar
-
-Add these to the bar element:
-
-| Attribute | Value | Default |
-|---|---|---|
-| `data-filter-sort` | `cms` keeps the order values first appear in your list | A to Z |
-| `data-filter-field` | A field name, like `state`, when one group has two bars (see below) | All `data-filter-value` text |
-| `data-filter-duration` | Thumb animation length in milliseconds. `0` turns the animation off. | `420` |
-| `data-filter-squash` | How far the thumb overshoots before settling, in px | `3` |
-
-**Focus ring:** set `--filter-focus` (color) and `--filter-focus-offset` on the bar's class with a custom property, or keep the defaults: the current text color, 2px out.
 
 ## Two bars on one list
 
