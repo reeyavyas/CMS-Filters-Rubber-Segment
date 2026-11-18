@@ -1,114 +1,164 @@
 # CMS Filters Rubber Segment
 
-A search field and a rubber segmented control that filter a Webflow CMS Collection List of advisors by state. The filters show only the states your advisors actually have, A to Z, and "All" always sits first.
+A reusable filter bar for Webflow: a search field and a rubber segmented control that filter any CMS Collection List. Use it for advisors by state, events by type, articles by topic, or anything else, on any page, as many times as you like.
 
-Tap a state and the white thumb stretches across to it, then squashes into place. You can also drag or flick it. When you turn on reduced motion, it jumps with no animation.
+You design every part in the Webflow Designer with your own classes. One site-wide script adds the behavior. It finds each bar through custom attributes, so no design values live in the code.
 
 ## What's in here
 
 | File | What it is |
 |---|---|
-| `webflow/1-controls-embed.html` | The search field, the segment, the results count and the empty message, with their CSS. Paste it into a Code Embed. |
-| `webflow/2-page-script.html` | The motion, filtering and equal-card-height script. Paste it into Page Settings, Before `</body>` tag. |
-| `advisor-filter.html` | A standalone prototype with made-up advisors. Open it in a browser to try everything without Webflow. |
-
-The people and phone numbers in the prototype are fictional (555-01xx numbers).
+| `webflow/filter-bar.js` | The whole component. Paste it once into Site settings, wrapped in a script tag. |
+| `demo.html` | Two working bars (advisors by state, and events by type) with made-up sample data. Its `<style>` block stands in for the classes you build in Webflow. |
 
 ## How it behaves
 
-- **Search** matches names, titles and office cities as you type, and works together with the state filter.
-- **Filters** size to their label plus padding: 8px top and bottom, 24px left and right on iPad, and 48px left and right on desktop (wider than 1024px). On phones, each line splits its space evenly between the filters.
-- **Wrapping:** when there are too many states to fit, the filters wrap onto another line, and the thumb stretches between lines.
-- **Keyboard:** Tab reaches the segment, and the arrow keys, Home and End move between filters.
-- **Layout:** on desktop and iPad, the bar runs full width, with search on the left (capped at 400px) and filters on the right. Below 720px, search sits on top and the filters sit underneath.
-- **Equal card heights:** when a card has secondary offices or a wrapped name or title, the card body moves up over the bottom of the photo, so every card stays the same height.
+- **Options build themselves** from the values on your items, A to Z by default. "All" always comes first. When an item with a new value appears, its option appears too.
+- **The thumb** stretches from the old option to the new one, then squashes into place. You can drag or flick it. With reduced motion turned on, it jumps with no animation.
+- **Search** matches as you type, and works together with the options.
+- **Keyboard:** Tab reaches the options, and the arrow keys, Home and End move between them.
+- **Wrapping:** if the options wrap onto more lines, the thumb stretches between lines.
+- **Late-loading items:** items added after the page loads (by Finsweet List Load, for example) are picked up and filtered automatically.
+- **Equal card heights (optional):** extra wrapped lines come out of the card's photo instead of making the card taller.
 
-## Webflow setup
+## Install once, for the whole site
 
-You need a paid site plan for Code Embeds and page custom code. Every custom attribute below uses the value `true`.
+1. Open **Site settings**, then **Custom code**, then **Footer code**.
+2. Type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
+3. Save and publish.
 
-### 1. CMS
+The script is about 15,000 characters. The Footer code field allows 50,000. On pages with no filter bar, it does nothing.
 
-- **Advisors collection:** has Home office (reference), Secondary offices (multi-reference) and a States field. The States field can be a multi-reference to a States collection (even one with all 50 states) or an Option field. Only states that at least one advisor has become filters.
+## Build a bar in the Designer
 
-### 2. The bar
+Every custom attribute below goes in **Element settings**, under **Custom attributes**. Where the value doesn't matter, use `true`.
 
-1. Add a **Code Embed** above the advisor Collection List.
-2. Paste in `webflow/1-controls-embed.html`.
+Each bar has a **group name**, like `advisors` or `events`. The group name ties a bar to its items, its count and its empty message, so two bars on one page never interfere.
 
-### 3. Tag each advisor card
+### 1. The bar
+
+Add a **Div Block** and style it however you like. This is your bar.
+
+| Attribute | Value |
+|---|---|
+| `data-filter-bar` | The group name, for example `advisors` |
+| `data-filter-label` (optional) | What screen readers announce, for example `Filter advisors by state` |
+
+### 2. The search field (optional)
+
+Inside the bar, add a **Form Block** and style its **Input**. Delete the form's submit button. Pressing Enter won't submit the form.
 
 | Attribute | Goes on |
 |---|---|
-| `data-advisor` | The Collection Item itself, not the card inside it |
-| `data-search` | Name, title, home office text and secondary office text |
-| `data-card-fit` | Name and title text |
-| `data-card-photo` | Photo wrapper |
-| `data-card-footer` | Teal bar |
-| `data-card-home` | Home office text inside the teal bar |
+| `data-filter-search` | The Input |
 
-Also give the card body (the section under the photo) a background color, because it moves up over the photo.
+### 3. The options track
 
-### 4. Secondary offices in the teal bar
+Inside the bar, add a **Div Block** for the track the options sit in. Its padding sets the gap between the thumb and the track's edge.
 
-1. Inside the teal bar, add a **Collection List** with **Secondary offices** as its source.
-2. Bind a text element to the office city, and give it the same class as the home office text.
-3. Set the nested list's **Empty State** to **display: none**.
+| Attribute | Goes on |
+|---|---|
+| `data-filter-options` | The track |
 
-### 5. Each advisor's states (hidden)
+### 4. The "All" option
 
-These do two jobs: they decide which filters appear, and which cards each filter shows.
+Inside the track, add a **Button** (or a Link Block or Div) and type **All**. This is the template every other option is copied from, so style it as an inactive option: padding, font, idle text color, and any breakpoint changes.
 
-- **Multi-reference States field:** inside the Collection Item, add a **Collection List** with **States** as its source. Bind a text element to **Name**, give it the attribute `data-state`, and give the list wrapper a class set to **display: none**.
-- **Option field:** inside the Collection Item, add one text element bound to the States field, with the attribute `data-state`, and hide it with **display: none**.
+| Attribute | Goes on |
+|---|---|
+| `data-filter-option` | The All option |
+| `data-filter-option-label` (optional) | A Text Block inside the option, if the label sits inside a Link Block |
 
-### 6. Script
+### 5. The thumb
 
-Paste `webflow/2-page-script.html` into **Pages**, then the page's gear icon, then **Custom Code**, then **Before `</body>` tag**.
+Inside the track, add an empty **Div Block**. Give it the thumb's look: **background color**, **text color** (the active label color) and **corner radius**. The script handles its size, position and layout.
 
-### 7. Collection List settings
+| Attribute | Goes on |
+|---|---|
+| `data-filter-thumb` | The thumb |
 
-Turn off pagination on the advisor list. The filter only sees cards that are on the page, and a Collection List shows at most 100 items. A state whose advisors are all on another page won't get a filter.
+### 6. The count and empty message (optional)
 
-### 8. Publish and test
+These can sit anywhere on the page.
 
-Custom code doesn't run in the Designer or Preview mode, so publish to your webflow.io staging domain and test there.
+| Attribute | Goes on | What it does |
+|---|---|---|
+| `data-filter-status` = group name | A Text Block | Shows the count, for example "3 advisors in Kentucky" |
+| `data-filter-noun` | Same Text Block | The word for one item, for example `advisor` |
+| `data-filter-noun-plural` (optional) | Same Text Block | The word for many, if it isn't the noun plus "s" |
+| `data-filter-empty` = group name | Any element | Shown only when nothing matches |
 
-## Customizing
+## Tag your items
 
-At the top of the embed, the `.af` block holds the colors, radius, height, inset and search cap. Replace the placeholder colors with your brand values, then check contrast again.
+Your Collection List, grid and cards stay yours. Add these:
 
-The thumb reads its position and corner radius from the page, so you can change `--af-radius` and `--af-inset` without touching the script.
+| Attribute | Goes on |
+|---|---|
+| `data-filter-item` = group name | Each **Collection Item** (the grid's direct child, not the card inside it) |
+| `data-filter-value` | Each value the item belongs to, like a state or category. For a multi-reference field, use a nested Collection List with a Text bound to the Name. For an Option or text field, bind one Text. Hide them with display: none if they shouldn't show. |
+| `data-filter-search-text` (optional) | Each text search should look at. With none, search looks at all the item's text. |
 
-## Using your own grid and cards
+Let the grid place items automatically. If you pin items to specific cells, hidden items leave holes.
 
-The embed only builds the bar: search, filters, results count and the empty message. Your grid and cards stay yours. The script never adds classes or layout styles to them. It only does three things to your elements:
+## Options for each bar
 
-1. **Hides filtered-out cards** by adding the `hidden` attribute to each `data-advisor` element. The embed includes a rule that hides it even when your own class sets a display value (flex, grid or block).
-2. **Sets one variable, `--extra`,** on each `data-advisor` element. The embed uses it to pull the photo up under the card body, so cards stay the same height.
-3. **Reads text** from your `data-search` and `data-state` elements. The `data-state` text also decides which filters appear.
+Add these to the bar element:
 
-For it to work with your grid:
+| Attribute | Value | Default |
+|---|---|---|
+| `data-filter-sort` | `cms` keeps the order values first appear in your list | A to Z |
+| `data-filter-field` | A field name, like `state`, when one group has two bars (see below) | All `data-filter-value` text |
+| `data-filter-duration` | Thumb animation length in milliseconds. `0` turns the animation off. | `420` |
+| `data-filter-squash` | How far the thumb overshoots before settling, in px | `3` |
 
-- Use a Collection List for the cards, and put `data-advisor` on the **Collection Item** (the grid's direct child).
-- Let the grid place items automatically. If you pin items to specific cells, hidden cards leave holes.
-- Give the card body (everything after the photo) a background color.
-- Leave the photo wrapper in normal flow, not absolutely positioned, so its bottom margin can pull the body up.
-- Skip the four `data-card-*` attributes if you don't want equal heights. Filtering and search work without them.
+**Focus ring:** set `--filter-focus` (color) and `--filter-focus-offset` on the bar's class with a custom property, or keep the defaults: the current text color, 2px out.
+
+## Two bars on one list
+
+To filter one list two ways, like advisors by state and by service, give both bars the same group name and different fields:
+
+- Bar 1: `data-filter-bar="advisors"` and `data-filter-field="state"`
+- Bar 2: `data-filter-bar="advisors"` and `data-filter-field="service"`
+- On items: `data-filter-value="state"` on state names, and `data-filter-value="service"` on service names
+
+Items show only when they match both bars.
+
+## Equal card heights (optional)
+
+| Attribute | Goes on |
+|---|---|
+| `data-fit-photo` | The photo wrapper. This gives up space. |
+| `data-fit-text` | Any text that may wrap, like the name and title |
+| `data-fit-grow` | An area that grows with extra lines, like a location bar |
+| `data-fit-base` | The first line inside that area, like the home office |
+
+Give everything after the photo a background color, and keep the photo wrapper in normal flow (not absolutely positioned).
+
+## More than 100 items: Finsweet List Load
+
+A Collection List shows at most 100 items per page, and the filter only sees items on the page. If a list outgrows that, use Finsweet's List Load to bring in every page. It's the only Finsweet piece you need. The filter bar doesn't depend on it, and it picks up the loaded items on its own.
+
+1. In **Site settings**, then **Custom code**, then **Head code**, add:
+   `<script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-list></script>`
+2. On the **Collection List**, add `fs-list-element` = `list` and `fs-list-load` = `all`.
+3. Turn on **Paginate items** in the Collection List settings. List Load needs Webflow's pagination to find the other pages.
+4. Set the pagination element to **display: none**.
+
+Check that nested Collection Lists (like states inside each item) come through on the loaded items. Finsweet's List Load page doesn't cover nested lists.
 
 ## Troubleshooting
 
 | What you see | Likely cause |
 |---|---|
-| Nothing filters | The script isn't in Before `</body>`, or you're testing in Preview mode |
-| Only "All" shows | The cards have no `data-state` text, or it sits outside the `data-advisor` element |
-| A state shows nobody | The state Name in the CMS doesn't match exactly |
-| Empty gaps where cards were | `data-advisor` is on the card instead of the Collection Item |
-| Photo shows through the card body | The card body has no background color |
-| Cards are uneven | `data-card-fit`, `data-card-footer` or `data-card-home` is missing |
+| Nothing happens | The script isn't in Footer code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
+| Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
+| The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
+| The active label is the wrong color | Set the text color on the thumb, not on the option |
+| Empty gaps in the grid | `data-filter-item` is on the card instead of the Collection Item, or items are pinned to grid cells |
+| Enter reloads the page | The Input isn't the one with `data-filter-search` |
 
 ## Known limits
 
-- Each advisor card uses two nested Collection Lists, so check Webflow's current limits on nested lists.
-- There's no limit on how much of the photo gets covered, so an advisor with many offices loses more of it.
+- The count reads "in" before the active option (for example "in Kentucky"). Change that word in the script if it reads oddly for another list.
 - The filter doesn't change the URL, so you can't share a link to a filtered view.
+- There's no limit on how much of a photo equal heights can cover.

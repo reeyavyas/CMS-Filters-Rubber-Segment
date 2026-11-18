@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filter Bar Demo</title>
+<style>
+  /* Everything in this <style> stands in for classes you design in Webflow.
+     The Filter Bar script adds behavior only; none of these values live in it. */
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff; background: linear-gradient(180deg, #0b2f47, #0e3b59); min-height: 100vh; }
+  .page { max-width: 1440px; margin: 0 auto; padding: 48px 16px; }
+  h2 { font: 700 24px Georgia, serif; margin: 48px 0 16px; }
+
+  /* Bar */
+  .filter-bar { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 12px; row-gap: 8px; padding: 8px; border-radius: 10px; background: rgba(255,255,255,.12); --filter-focus: #fff; --filter-focus-offset: -2px; }
+  .filter-search { position: relative; flex: 1 1 240px; width: 400px; max-width: 400px; margin: 0; padding: 3px 0 3px 3px; }
+  .filter-search svg { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #13232e; pointer-events: none; }
+  .filter-input { width: 100%; height: 38px; margin: 0; padding: 0 12px 0 40px; border: 0; border-radius: 7px; font: 16px system-ui, sans-serif; color: #13232e; background: #fff; }
+  .filter-input::placeholder { color: #56636c; }
+  .filter-input:focus-visible { outline: 2px solid #13232e; outline-offset: -4px; }
+  .filter-options { display: flex; flex-wrap: wrap; flex: 0 0 auto; max-width: 100%; padding: 3px; border-radius: 10px; }
+  .filter-option { display: grid; place-items: center; padding: 8px 24px; font: 600 15px/22px system-ui, sans-serif; color: rgba(255,255,255,.82); text-decoration: none; white-space: nowrap; }
+  .filter-thumb { background: #fff; color: #0b2f47; border-radius: 7px; }
+  .filter-status { margin: 24px 0 16px; font-size: 15px; color: rgba(255,255,255,.82); }
+  .filter-empty { margin: 0 0 16px; font-size: 17px; }
+  @media (min-width: 1025px) { .filter-option { padding-left: 48px; padding-right: 48px; } }
+  @media (max-width: 719px) {
+    .filter-search { flex-basis: 100%; width: auto; max-width: none; padding: 3px 3px 0; }
+    .filter-search svg { top: calc(50% + 1.5px); }
+    .filter-options { flex-basis: 100%; }
+    .filter-option { flex-grow: 1; padding-left: 4px; padding-right: 4px; }
+  }
+
+  /* Cards: your own grid and card design */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
+  .card { display: flex; flex-direction: column; height: 100%; background: #fff; color: #13232e; border-radius: 24px; overflow: hidden; text-align: center; }
+  .card-photo { aspect-ratio: 4 / 3; display: grid; place-items: center; background: linear-gradient(180deg, #fff, #b9d3e3); font: 700 48px Georgia, serif; color: #0b2f47; }
+  .card-body { background: #fff; padding: 16px 16px 24px; display: grid; gap: 4px; justify-items: center; }
+  .card-name { font: 700 22px Georgia, serif; margin: 0; }
+  .card-title { margin: 0; color: #00706a; }
+  .card-bar { margin-top: auto; padding: 12px 16px; background: #00706a; color: #fff; font-weight: 600; font-size: 18px; }
+  .card-bar div + div { margin-top: 4px; }
+  .event { background: #fff; color: #13232e; border-radius: 16px; padding: 20px; }
+  .event-tag { display: inline-block; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: #00706a; text-transform: uppercase; letter-spacing: .04em; }
+  .event h3 { margin: 0; font-size: 18px; }
+  .hide { display: none; }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <!-- Example 1: advisors by state, with search and equal card heights. Sample people are made up. -->
+  <div class="filter-bar" data-filter-bar="advisors" data-filter-label="Filter advisors by state">
+    <form class="filter-search" onsubmit="return false">
+      <label for="advisorSearch" class="hide">Search advisors</label>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="advisorSearch" class="filter-input" type="search" placeholder="Search by name or city" data-filter-search>
+    </form>
+    <div class="filter-options" data-filter-options>
+      <a href="#" class="filter-option" data-filter-option>All</a>
+      <div class="filter-thumb" data-filter-thumb></div>
+    </div>
+  </div>
+  <p class="filter-status" data-filter-status="advisors" data-filter-noun="advisor"></p>
+  <p class="filter-empty" data-filter-empty="advisors">No advisors match. Try a different name, city or state.</p>
+
+  <div class="grid" role="list">
+    <div role="listitem" data-filter-item="advisors">
+      <div class="card">
+        <div class="card-photo" data-fit-photo>DW</div>
+        <div class="card-body">
+          <h3 class="card-name" data-filter-search-text data-fit-text>Dana Whitfield</h3>
+          <p class="card-title" data-filter-search-text data-fit-text>Wealth Advisor, Regional Manager</p>
+        </div>
+        <div class="card-bar" data-fit-grow>
+          <div data-filter-search-text data-fit-base>Evansville, IN</div>
+          <div data-filter-search-text>Also Owensboro, KY</div>
+        </div>
+        <div class="hide"><span data-filter-value>Indiana</span><span data-filter-value>Kentucky</span></div>
+      </div>
+    </div>
+    <div role="listitem" data-filter-item="advisors">
+      <div class="card">
+        <div class="card-photo" data-fit-photo>MO</div>
+        <div class="card-body">
+          <h3 class="card-name" data-filter-search-text data-fit-text>Marcus Oyelaran</h3>
+          <p class="card-title" data-filter-search-text data-fit-text>Wealth Advisor</p>
+        </div>
+        <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>Lexington, KY</div></div>
+        <div class="hide"><span data-filter-value>Kentucky</span></div>
+      </div>
+    </div>
+    <div role="listitem" data-filter-item="advisors">
+      <div class="card">
+        <div class="card-photo" data-fit-photo>PR</div>
+        <div class="card-body">
+          <h3 class="card-name" data-filter-search-text data-fit-text>Priya Raman</h3>
+          <p class="card-title" data-filter-search-text data-fit-text>Senior Wealth Advisor</p>
+        </div>
+        <div class="card-bar" data-fit-grow>
+          <div data-filter-search-text data-fit-base>Murfreesboro, TN</div>
+          <div data-filter-search-text>Also Clarksville, TN</div>
+          <div data-filter-search-text>Also Bowling Green, KY</div>
+        </div>
+        <div class="hide"><span data-filter-value>Tennessee</span><span data-filter-value>Kentucky</span></div>
+      </div>
+    </div>
+    <div role="listitem" data-filter-item="advisors">
+      <div class="card">
+        <div class="card-photo" data-fit-photo>EV</div>
+        <div class="card-body">
+          <h3 class="card-name" data-filter-search-text data-fit-text>Elena Vasquez</h3>
+          <p class="card-title" data-filter-search-text data-fit-text>Wealth Advisor</p>
+        </div>
+        <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>Knoxville, TN</div></div>
+        <div class="hide"><span data-filter-value>Tennessee</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2: the same component filtering events by category, in CMS order, with no search -->
+  <h2>Events</h2>
+  <div class="filter-bar" data-filter-bar="events" data-filter-sort="cms" data-filter-label="Filter events by type">
+    <div class="filter-options" data-filter-options>
+      <a href="#" class="filter-option" data-filter-option>All</a>
+      <div class="filter-thumb" data-filter-thumb></div>
+    </div>
+  </div>
+  <p class="filter-status" data-filter-status="events" data-filter-noun="event"></p>
+  <div class="grid" role="list">
+    <div class="event" role="listitem" data-filter-item="events"><span class="event-tag" data-filter-value>Workshop</span><h3>Planning for retirement</h3></div>
+    <div class="event" role="listitem" data-filter-item="events"><span class="event-tag" data-filter-value>Webinar</span><h3>Reading your statement</h3></div>
+    <div class="event" role="listitem" data-filter-item="events"><span class="event-tag" data-filter-value>Workshop</span><h3>College savings basics</h3></div>
+    <div class="event" role="listitem" data-filter-item="events"><span class="event-tag" data-filter-value>Seminar</span><h3>Estate planning 101</h3></div>
+  </div>
+</main>
+
+<!-- In Webflow this goes in Site settings > Custom code > Footer code -->
+<script src="webflow/filter-bar.js"></script>
+</body>
+</html>
