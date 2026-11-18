@@ -10,17 +10,19 @@
     --af-placeholder: #56636c;
     --af-radius: 10px;
     --af-h: 44px;
-    --af-inset: 3px;   /* must match INSET in the page script */
+    --af-inset: 3px;
     --af-search-max: 400px;   /* widest the search field gets on desktop and iPad */
   }
-  [hidden] { display: none !important; }
+  .af, .af * { box-sizing: border-box; }
+  /* Filtered-out cards get the hidden attribute; this wins over any display your own classes set */
+  .af [hidden], [data-advisor][hidden] { display: none !important; }
   .af-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   /* One shared track holds the search field and the segment */
-  .af-controls { display: flex; flex-wrap: wrap; justify-content: space-between; box-sizing: border-box; column-gap: 12px; row-gap: 8px; padding: 8px; border-radius: var(--af-radius); background: var(--af-track); }
-  .af-search { position: relative; flex: 1 1 240px; width: var(--af-search-max); max-width: var(--af-search-max); box-sizing: border-box; padding: var(--af-inset) 0 var(--af-inset) var(--af-inset); }
+  .af-controls { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 12px; row-gap: 8px; padding: 8px; border-radius: var(--af-radius); background: var(--af-track); }
+  .af-search { position: relative; flex: 1 1 240px; width: var(--af-search-max); max-width: var(--af-search-max); padding: var(--af-inset) 0 var(--af-inset) var(--af-inset); }
   .af-search svg { position: absolute; left: calc(var(--af-inset) + 12px); top: 50%; transform: translateY(-50%); color: var(--af-ink); pointer-events: none; }
   .af-search input {
-    width: 100%; box-sizing: border-box; height: calc(var(--af-h) - 2 * var(--af-inset)); margin: 0;
+    width: 100%; height: calc(var(--af-h) - 2 * var(--af-inset)); margin: 0;
     padding: 0 12px 0 40px;
     border: 0; border-radius: calc(var(--af-radius) - var(--af-inset));
     font: inherit; font-size: 16px; color: var(--af-ink); background: var(--af-white);
@@ -31,7 +33,7 @@
   /* Each filter is its label plus padding, no set width. 22px line + 8px top and bottom
      + 3px inset each side = 44px, the same height as --af-h. */
   .rs {
-    position: relative; flex: 0 0 auto; min-width: 0; max-width: 100%; box-sizing: border-box;
+    position: relative; flex: 0 0 auto; max-width: 100%;
     padding: var(--af-inset);
     border-radius: var(--af-radius);
     touch-action: pan-y; user-select: none; -webkit-user-select: none;
@@ -39,7 +41,7 @@
   .rs:has(:focus-visible) { outline: 2px solid var(--af-white); outline-offset: -2px; }
   .rs-slots { display: flex; flex-wrap: wrap; }
   .rs button, .rs-thumb span {
-    flex: 0 0 auto; display: grid; place-items: center; box-sizing: border-box; margin: 0;
+    flex: 0 0 auto; display: grid; place-items: center; margin: 0;
     padding: 8px 24px;
     font: inherit; font-size: 15px; font-weight: 600; line-height: 22px; white-space: nowrap;
   }
@@ -47,7 +49,7 @@
     border: 0; background: none; cursor: pointer; color: var(--af-idle-text);
     outline: none; -webkit-tap-highlight-color: transparent;
   }
-  .rs-thumb { position: absolute; inset: 0; padding: var(--af-inset); box-sizing: border-box; background: var(--af-white); pointer-events: none; }
+  .rs-thumb { position: absolute; inset: 0; padding: var(--af-inset); background: var(--af-white); pointer-events: none; }
   .rs-thumb span { color: var(--af-navy); }
   .af-status { margin: 24px 0 16px; font-size: 15px; color: var(--af-idle-text); }
   .af-empty { margin: 0 0 16px; font-size: 17px; color: var(--af-white); }

@@ -85,7 +85,23 @@ Custom code doesn't run in the Designer or Preview mode, so publish to your webf
 
 At the top of the embed, the `.af` block holds the colors, radius, height, inset and search cap. Replace the placeholder colors with your brand values, then check contrast again.
 
-Keep `--af-inset` equal to `INSET` in the script (both are 3px), or the thumb won't line up.
+The thumb reads its position and corner radius from the page, so you can change `--af-radius` and `--af-inset` without touching the script.
+
+## Using your own grid and cards
+
+The embed only builds the bar: search, filters, results count and the empty message. Your grid and cards stay yours. The script never adds classes or layout styles to them. It only does three things to your elements:
+
+1. **Hides filtered-out cards** by adding the `hidden` attribute to each `data-advisor` element. The embed includes a rule that hides it even when your own class sets a display value (flex, grid or block).
+2. **Sets one variable, `--extra`,** on each `data-advisor` element. The embed uses it to pull the photo up under the card body, so cards stay the same height.
+3. **Reads text** from your `data-search`, `data-state` and `data-state-option` elements.
+
+For it to work with your grid:
+
+- Use a Collection List for the cards, and put `data-advisor` on the **Collection Item** (the grid's direct child).
+- Let the grid place items automatically. If you pin items to specific cells, hidden cards leave holes.
+- Give the card body (everything after the photo) a background color.
+- Leave the photo wrapper in normal flow, not absolutely positioned, so its bottom margin can pull the body up.
+- Skip the four `data-card-*` attributes if you don't want equal heights. Filtering and search work without them.
 
 ## Troubleshooting
 

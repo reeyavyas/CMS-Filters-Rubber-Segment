@@ -22,7 +22,9 @@
   const status = document.getElementById('resultsStatus');
   const empty = document.getElementById('emptyState');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const INSET = 3, RADIUS = 7, SQUASH = 3, DURATION = 420, GLIDE_MS = 150;
+  const SQUASH = 3, DURATION = 420, GLIDE_MS = 150;
+  // Thumb corners follow the CSS: track radius minus its inset
+  const RADIUS = parseFloat(getComputedStyle(seg).borderTopLeftRadius) - parseFloat(getComputedStyle(seg).paddingTop);
   const EASE = 'cubic-bezier(.3,.7,.2,1)';
   let active = 0, anim = null, drag = null, suppressClick = false;   // slot 0 is "All"
 
@@ -52,7 +54,7 @@
     anim?.cancel();
     thumb.style.clipPath = clip(frames.at(-1));
     if (reduceMotion.matches) return;
-    const offsets = { 2: [0, 1], 3: [0, .6, 1], 4: [0, .45, .8, 1] }[frames.length];
+    const offsets = frames.length === 4 ? [0, .45, .8, 1] : [0, 1];
     anim = thumb.animate(frames.map((f, k) => ({ clipPath: clip(f), offset: offsets[k], easing: EASE })), { duration: DURATION });
   }
 
@@ -139,7 +141,7 @@
   }).observe(seg);
 
   // Equal card heights: every line past the first in the name or title ([data-card-fit]), and every
-  // teal-bar line below the home office, comes out of the photo instead of making the card taller
+  // teal-bar line past the home office line, comes out of the photo instead of making the card taller
   const wrapExtra = el => {
     const range = document.createRange();
     range.selectNodeContents(el);
@@ -153,7 +155,7 @@
     if (c.hidden) return;
     let extra = 0;
     const foot = c.querySelector('[data-card-footer]'), home = c.querySelector('[data-card-home]');
-    if (foot && home) extra += foot.getBoundingClientRect().bottom - home.getBoundingClientRect().bottom - parseFloat(getComputedStyle(foot).paddingBottom);
+    if (foot && home) extra += foot.getBoundingClientRect().bottom - home.getBoundingClientRect().bottom - parseFloat(getComputedStyle(foot).paddingBottom) + wrapExtra(home);
     c.querySelectorAll('[data-card-fit]').forEach(el => { extra += wrapExtra(el); });
     c.style.setProperty('--extra', Math.max(0, extra) + 'px');
   };
@@ -180,6 +182,5 @@
   }
   search.addEventListener('input', applyFilters);
   applyFilters();
-
 })();
 </script>
