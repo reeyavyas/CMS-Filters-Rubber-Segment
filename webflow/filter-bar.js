@@ -1,7 +1,10 @@
 /* Filter Bar: a reusable search field and rubber segment filter for Webflow CMS lists.
-   Paste once into Site settings > Custom code > Footer code, wrapped in a script tag. It finds every [data-filter-bar]
-   on every page and adds behavior only. All design comes from your own Webflow classes. */
+   Wrap it in a script tag and paste it into a Code Embed (or a Component), page settings, or site settings.
+   It finds every [data-filter-bar] on the page and adds behavior only. All design comes from your own Webflow classes. */
 (() => {
+  if (window.filterBarLoaded) return;   // safe to include more than once, like a Component used twice on a page
+  window.filterBarLoaded = true;
+
   // Functional CSS only: positioning, hiding and hit areas. Colors, sizes and spacing stay in your classes.
   const STYLE = `
 [data-filter-item][hidden],[data-filter-empty][hidden],[data-filter-pagination][hidden]{display:none!important}
@@ -342,13 +345,18 @@
     groups.forEach((bars, g) => { bars.forEach(b => b.sync()); applyGroup(g, true); });
     watchFit();
   }
-  refresh();
   let queued = false;
-  new MutationObserver(records => {
-    const added = records.some(r => [...r.addedNodes].some(n => n.nodeType === 1 &&
-      (n.matches('[data-filter-item], [data-filter-bar], [data-fit-photo]') || n.querySelector('[data-filter-item], [data-filter-bar], [data-fit-photo]'))));
-    if (!added || queued) return;
-    queued = true;
-    setTimeout(() => { queued = false; refresh(); });   // one refresh per batch of added items
-  }).observe(document.body, { childList: true, subtree: true });
+  const start = () => {
+    refresh();
+    new MutationObserver(records => {
+      const added = records.some(r => [...r.addedNodes].some(n => n.nodeType === 1 &&
+        (n.matches('[data-filter-item], [data-filter-bar], [data-fit-photo]') || n.querySelector('[data-filter-item], [data-filter-bar], [data-fit-photo]'))));
+      if (!added || queued) return;
+      queued = true;
+      setTimeout(() => { queued = false; refresh(); });   // one refresh per batch of added items
+    }).observe(document.body, { childList: true, subtree: true });
+  };
+  // A Code Embed can run before the bar and cards below it exist, so wait for the page to finish loading
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
 })();

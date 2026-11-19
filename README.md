@@ -28,17 +28,29 @@ These steps get a bar working on one page. To use it across the whole site inste
 
 Every attribute goes in **Element settings**, under **Custom attributes**. Where the value doesn't matter, use `true`.
 
-### Step 1: Add the script to the page
+### Step 1: Add the script
+
+Pick one. You need a paid site plan for custom code. The script is about 20,000 characters, and each place below allows 50,000.
+
+**Option A: a Code Embed in a Component (recommended)**
+
+This keeps page settings empty, and the script travels with the bar wherever you use it.
+
+1. Make a **Div Block** to hold the whole filter (bar, count and pager), and turn it into a **Component**.
+2. Inside the Component, **beside the bar, not inside it**, add a **Code Embed**. Webflow wraps every Embed in its own div, and inside the bar that div would add an extra gap.
+3. In the Embed, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
+4. Give the Embed a class set to **display: none**. The script still runs.
+
+The Embed can sit above or below the bar. The script waits for the page to finish loading. Using the Component more than once on a page is fine, because the script runs only once.
+
+**Option B: page settings**
 
 1. In the **Pages** panel, hover over the page and click its **gear icon**.
 2. Scroll to **Custom Code**.
 3. In **Before `</body>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 4. Save.
 
-- **Use the Before `</body>` field, not the head field.** The bar and items need to be on the page when the script runs.
-- **Plan and size:** you need a paid site plan for custom code. The script is about 20,000 characters, and the field allows 50,000.
-- **CMS template pages:** the script runs for every item that uses the template.
-- **Other pages:** each page with a bar needs its own copy.
+Use the Before `</body>` field, not the head field. On a CMS template page, the script runs for every item that uses the template, and each page with a bar needs its own copy.
 
 ### Step 2: Build the bar
 
@@ -170,7 +182,7 @@ Instead of Step 1, paste the script once for every page:
 
 On pages with no filter bar, it does nothing. Steps 2 to 7 stay the same on each page with a bar.
 
-**Moving from page to site later:** add it to Site settings, then delete it from each page. Leaving both won't break anything, because the script skips a bar it has already set up, but it would load twice.
+**Moving to the whole site later:** add it to Site settings, then delete it from the Component's Embed or from each page. Leaving both won't break anything, because the script runs only once per page, but the extra copy adds to the page's size.
 
 ## Two bars on one list
 
@@ -209,11 +221,12 @@ Check that nested Collection Lists (like states inside each item) come through o
 
 | What you see | Likely cause |
 |---|---|
-| Nothing happens | The script isn't in Footer code or the page's Before `</body>` field, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
+| Nothing happens | The script isn't in a Code Embed, the page's Before `</body>` field or Footer code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
 | Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
 | Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 5). |
 | The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
+| An extra gap inside the bar | The Code Embed sits inside the bar. Move it beside the bar. |
 | Empty gaps in the grid | `data-filter-item` is on the card instead of the Collection Item, or items are pinned to grid cells |
 | Enter reloads the page | The Input isn't the one with `data-filter-search` |
 
