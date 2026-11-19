@@ -72,6 +72,21 @@ Don't bind the track to the CMS. The script adds one option for each value you t
 2. Style only its **background color**, **text color** (the active label color) and **corner radius**. The script handles its size, position and layout.
 3. Add `data-filter-thumb` = `true`.
 
+**Recommended layout**
+
+These Style panel settings center the bar, keep it only as wide as it needs to be, and spread the options evenly when there's room. They're what `demo.html` uses.
+
+| Element | Setting |
+|---|---|
+| Bar | Display: Flex, wrap, justify center. Width: `fit-content`. Max width: 100%. Left and right margin: Auto. |
+| Bar, desktop only (wider than 1024px) | Min width: 700px |
+| Bar, below 720px | Width: Auto |
+| Search wrapper | Flex child, Custom: grow `1000`, shrink `1`, basis `240px`. Width and max width: 400px. |
+| Options track | Flex child, Custom: grow `1`, shrink `1`, basis Auto |
+| "All" option | Flex child, Custom: grow `1` |
+
+The high grow on the search wrapper lets it take spare space first, up to its 400px cap. The track takes whatever is left, and the options share it equally. Without a search field, the options spread across the bar's 700px minimum on desktop.
+
 ### Step 3: Count and empty message (optional)
 
 These can go anywhere on the page.
