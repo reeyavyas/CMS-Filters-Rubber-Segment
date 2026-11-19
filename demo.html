@@ -49,6 +49,16 @@
   .event { background: #fff; color: #13232e; border-radius: 16px; padding: 20px; }
   .event-tag { display: inline-block; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: #00706a; text-transform: uppercase; letter-spacing: .04em; }
   .event h3 { margin: 0; font-size: 18px; }
+  /* Pagination: your own design */
+  .filter-range { margin: 0 0 16px; font-size: 15px; color: rgba(255,255,255,.82); }
+  .pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 32px; }
+  .pager-pages { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+  .pager-page, .pager-step { display: grid; place-items: center; min-width: 44px; height: 44px; padding: 0 12px; border-radius: 10px; color: #fff; font-weight: 600; text-decoration: none; }
+  .pager-page:hover, .pager-step:hover { background: rgba(255,255,255,.12); }
+  .pager-page.is-current { background: #fff; color: #0b2f47; }
+  .pager-step.is-disabled { opacity: .4; pointer-events: none; }
+  .pager-gap { display: grid; place-items: center; min-width: 24px; height: 44px; color: rgba(255,255,255,.82); }
+  .pager a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .hide { display: none; }
 </style>
 </head>
@@ -70,59 +80,41 @@
   <p class="filter-status" data-filter-status="advisors" data-filter-noun="advisor"></p>
   <p class="filter-empty" data-filter-empty="advisors">No advisors match. Try a different name, city or state.</p>
 
-  <div class="grid" role="list">
-    <div role="listitem" data-filter-item="advisors">
-      <div class="card">
-        <div class="card-photo" data-fit-photo>DW</div>
-        <div class="card-body">
-          <h3 class="card-name" data-filter-search-text data-fit-text>Dana Whitfield</h3>
-          <p class="card-title" data-filter-search-text data-fit-text>Wealth Advisor, Regional Manager</p>
-        </div>
-        <div class="card-bar" data-fit-grow>
-          <div data-filter-search-text data-fit-base>Evansville, IN</div>
-          <div data-filter-search-text>Also Owensboro, KY</div>
-        </div>
-        <div class="hide"><span data-filter-value>Indiana</span><span data-filter-value>Kentucky</span></div>
-      </div>
+  <p class="filter-range" data-filter-range="advisors"></p>
+  <div class="grid" role="list" id="advisorGrid"></div>
+
+  <!-- Pagination: style every piece with your own classes -->
+  <nav class="pager" data-filter-pagination="advisors" data-filter-page-size="12">
+    <a href="#" class="pager-step" data-filter-prev>Previous</a>
+    <div class="pager-pages" data-filter-pages>
+      <a href="#" class="pager-page" data-filter-page>1</a>
+      <span class="pager-gap" data-filter-page-gap>…</span>
     </div>
-    <div role="listitem" data-filter-item="advisors">
-      <div class="card">
-        <div class="card-photo" data-fit-photo>MO</div>
-        <div class="card-body">
-          <h3 class="card-name" data-filter-search-text data-fit-text>Marcus Oyelaran</h3>
-          <p class="card-title" data-filter-search-text data-fit-text>Wealth Advisor</p>
-        </div>
-        <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>Lexington, KY</div></div>
-        <div class="hide"><span data-filter-value>Kentucky</span></div>
-      </div>
-    </div>
-    <div role="listitem" data-filter-item="advisors">
-      <div class="card">
-        <div class="card-photo" data-fit-photo>PR</div>
-        <div class="card-body">
-          <h3 class="card-name" data-filter-search-text data-fit-text>Priya Raman</h3>
-          <p class="card-title" data-filter-search-text data-fit-text>Senior Wealth Advisor</p>
-        </div>
-        <div class="card-bar" data-fit-grow>
-          <div data-filter-search-text data-fit-base>Murfreesboro, TN</div>
-          <div data-filter-search-text>Also Clarksville, TN</div>
-          <div data-filter-search-text>Also Bowling Green, KY</div>
-        </div>
-        <div class="hide"><span data-filter-value>Tennessee</span><span data-filter-value>Kentucky</span></div>
-      </div>
-    </div>
-    <div role="listitem" data-filter-item="advisors">
-      <div class="card">
-        <div class="card-photo" data-fit-photo>EV</div>
-        <div class="card-body">
-          <h3 class="card-name" data-filter-search-text data-fit-text>Elena Vasquez</h3>
-          <p class="card-title" data-filter-search-text data-fit-text>Wealth Advisor</p>
-        </div>
-        <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>Knoxville, TN</div></div>
-        <div class="hide"><span data-filter-value>Tennessee</span></div>
-      </div>
-    </div>
-  </div>
+    <a href="#" class="pager-step" data-filter-next>Next</a>
+  </nav>
+
+  <script>
+    // Demo only: stands in for a Webflow Collection List of 100 made-up advisors
+    (() => {
+      const first = ['Dana', 'Marcus', 'Priya', 'Tom', 'Elena', 'Grant', 'Keisha', 'Owen', 'Rosa', 'Felix'];
+      const last = ['Whitfield', 'Oyelaran', 'Raman', 'Hollister', 'Vasquez', 'Pemberton', 'Monroe', 'Calder', 'Ibarra', 'Lindqvist'];
+      const offices = [['Evansville, IN', 'Indiana'], ['Lexington, KY', 'Kentucky'], ['Murfreesboro, TN', 'Tennessee'], ['Jasper, IN', 'Indiana'], ['Owensboro, KY', 'Kentucky'], ['Knoxville, TN', 'Tennessee']];
+      const html = [];
+      for (let i = 0; i < 100; i++) {
+        const name = `${first[i % 10]} ${last[Math.floor(i / 10)]}`;
+        const [city, state] = offices[i % 6], [alsoCity, alsoState] = offices[(i + 1) % 6];
+        const also = i % 4 === 0;
+        const title = i % 9 === 0 ? 'Wealth Advisor, Regional Manager' : 'Wealth Advisor';
+        html.push(`<div role="listitem" data-filter-item="advisors"><div class="card">
+          <div class="card-photo" data-fit-photo>${name.split(' ').map(w => w[0]).join('')}</div>
+          <div class="card-body"><h3 class="card-name" data-filter-search-text data-fit-text>${name}</h3><p class="card-title" data-filter-search-text data-fit-text>${title}</p></div>
+          <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>${city}</div>${also ? `<div data-filter-search-text>Also ${alsoCity}</div>` : ''}</div>
+          <div class="hide"><span data-filter-value>${state}</span>${also && alsoState !== state ? `<span data-filter-value>${alsoState}</span>` : ''}</div>
+        </div></div>`);
+      }
+      document.getElementById('advisorGrid').innerHTML = html.join('');
+    })();
+  </script>
 
   <!-- Example 2: the same component filtering events by category, in CMS order, with no search -->
   <h2>Events</h2>

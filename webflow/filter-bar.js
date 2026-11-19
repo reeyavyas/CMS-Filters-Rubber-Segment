@@ -4,7 +4,8 @@
 (() => {
   // Functional CSS only: positioning, hiding and hit areas. Colors, sizes and spacing stay in your classes.
   const STYLE = `
-[data-filter-item][hidden],[data-filter-empty][hidden]{display:none!important}
+[data-filter-item][hidden],[data-filter-empty][hidden],[data-filter-pagination][hidden]{display:none!important}
+[data-filter-prev],[data-filter-next],[data-filter-page]{cursor:pointer}
 [data-filter-options]{position:relative;touch-action:pan-y;-webkit-user-select:none;user-select:none}
 [data-filter-option]{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
 [data-filter-options]:has(:focus-visible){outline:2px solid var(--filter-focus,currentColor);outline-offset:var(--filter-focus-offset,2px)}
@@ -220,23 +221,85 @@
     };
   }
 
-  // Shows the items that pass every bar in the group, then updates its status and empty elements
-  function applyGroup(group) {
+  // Filters every item in the group first, then shows one page of the matches (all of them without a
+  // pager). A filter or search change goes back to page 1; keepPage stays on the current page.
+  const pageOf = new Map();   // group name -> current page, from 1
+  function applyGroup(group, keepPage = false) {
     const bars = groups.get(group) || [];
-    let shown = 0;
-    for (const item of q(attr('data-filter-item', group))) {
-      const ok = bars.every(b => b.matches(item));
-      item.hidden = !ok;
-      shown += ok;
-    }
+    const items = q(attr('data-filter-item', group));
+    const matched = items.filter(item => bars.every(b => b.matches(item)));
+    const pagers = q(attr('data-filter-pagination', group)).filter(p => p.filterPager);
+    const size = num(pagers[0]?.dataset.filterPageSize, 0) || matched.length || 1;
+    const count = Math.max(1, Math.ceil(matched.length / size));
+    const page = Math.min(count, keepPage ? pageOf.get(group) || 1 : 1);
+    pageOf.set(group, page);
+    const start = (page - 1) * size, onPage = new Set(matched.slice(start, start + size));
+    items.forEach(item => { item.hidden = !onPage.has(item); });
+
+    const shown = matched.length;
     const labels = bars.map(b => b.label()).filter(Boolean), words = bars.map(b => b.query()).filter(Boolean);
     q(attr('data-filter-status', group)).forEach(el => {
       const one = el.dataset.filterNoun || 'item', many = el.dataset.filterNounPlural || `${one}s`;
       el.setAttribute('role', 'status');
       el.textContent = `${shown} ${shown === 1 ? one : many}${labels.length ? ` in ${labels.join(', ')}` : ''}${words.length ? ` matching “${words.join(' ')}”` : ''}`;
     });
+    q(attr('data-filter-range', group)).forEach(el => { el.textContent = shown ? `Showing ${start + 1} to ${start + onPage.size} of ${shown}` : ''; });
     q(attr('data-filter-empty', group)).forEach(el => { el.hidden = shown > 0; });
+    pagers.forEach(p => renderPager(p, page, count));
     q('[data-fit-photo]').forEach(fit);   // cards just shown get their height now, not on the next frame
+  }
+
+  // Pagination (optional): [data-filter-pagination="group"] with data-filter-page-size. Inside it, any of:
+  // [data-filter-prev], [data-filter-next], and a [data-filter-pages] wrapper holding one [data-filter-page]
+  // template (plus an optional [data-filter-page-gap] for "..."). Current and disabled states get classes
+  // you style in Webflow: is-current and is-disabled, or your own names via data-filter-current-class
+  // and data-filter-disabled-class.
+  function setupPager(pager) {
+    const group = pager.dataset.filterPagination;
+    const tpl = pager.querySelector('[data-filter-page]'), gap = pager.querySelector('[data-filter-page-gap]');
+    tpl?.remove();
+    gap?.remove();
+    if (!pager.hasAttribute('aria-label')) pager.setAttribute('aria-label', 'Pages');
+    pager.filterPager = { pages: pager.querySelector('[data-filter-pages]'), tpl, gap };
+    if (!groups.has(group)) groups.set(group, []);
+    pager.addEventListener('click', e => {
+      const t = e.target.closest('[data-filter-prev], [data-filter-next], [data-filter-page]');
+      if (!t) return;
+      e.preventDefault();   // page controls built from Webflow Buttons are links
+      if (t.getAttribute('aria-disabled') === 'true') return;
+      const p = pageOf.get(group) || 1;
+      pageOf.set(group, t.matches('[data-filter-prev]') ? p - 1 : t.matches('[data-filter-next]') ? p + 1 : +t.dataset.filterPageNumber);
+      applyGroup(group, true);
+      if (t.matches('[data-filter-page]')) pager.querySelector('[aria-current="page"]')?.focus();   // the old button was replaced
+      // Bring the top of the list back into view when it has scrolled away
+      const top = document.querySelector(attr('data-filter-bar', group)) || q(attr('data-filter-item', group)).find(i => !i.hidden);
+      if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+    });
+  }
+  function renderPager(pager, page, count) {
+    const { pages, tpl, gap } = pager.filterPager;
+    const current = pager.dataset.filterCurrentClass || 'is-current', disabled = pager.dataset.filterDisabledClass || 'is-disabled';
+    pager.hidden = count < 2;
+    [['[data-filter-prev]', page <= 1], ['[data-filter-next]', page >= count]].forEach(([sel, off]) => q(sel, pager).forEach(b => {
+      b.setAttribute('aria-disabled', String(off));
+      b.classList.toggle(disabled, off);
+    }));
+    if (!pages || !tpl) return;
+    // With a gap template and more than 7 pages: first, last and the pages either side of the current one
+    const compact = gap && count > 7, list = [];
+    for (let n = 1; n <= count; n++) if (!compact || n === 1 || n === count || Math.abs(n - page) <= 1) list.push(n);
+    const els = [];
+    list.forEach((n, i) => {
+      if (i && n - list[i - 1] > 1) els.push(gap.cloneNode(true));
+      const b = tpl.cloneNode(true);
+      (b.querySelector('[data-filter-page-label]') || b).textContent = n;
+      b.dataset.filterPageNumber = n;
+      b.setAttribute('aria-label', `Page ${n}`);
+      b.classList.toggle(current, n === page);
+      if (n === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+      els.push(b);
+    });
+    pages.replaceChildren(...els);
   }
 
   // Equal card heights (optional): lines that wrap in [data-fit-text], or that the [data-fit-grow] area
@@ -267,7 +330,8 @@
       const g = bar.dataset.filterBar;
       groups.set(g, [...(groups.get(g) || []), bar.filterBar]);
     });
-    groups.forEach((bars, g) => { bars.forEach(b => b.sync()); applyGroup(g); });
+    q('[data-filter-pagination]').forEach(p => { if (!p.filterPager) setupPager(p); });
+    groups.forEach((bars, g) => { bars.forEach(b => b.sync()); applyGroup(g, true); });
     watchFit();
   }
   refresh();

@@ -9,13 +9,14 @@ You design every part in the Webflow Designer with your own classes. One script 
 | File | What it is |
 |---|---|
 | `webflow/filter-bar.js` | The whole component. Paste it into Webflow, wrapped in a script tag. |
-| `demo.html` | Two working bars (advisors by state, and events by type) with made-up sample data. Its `<style>` block stands in for the classes you build in Webflow. |
+| `demo.html` | Two working bars with made-up sample data: 100 advisors by state at 12 per page, and events by type. Its `<style>` block stands in for the classes you build in Webflow. |
 
 ## How it behaves
 
 - **Options build themselves** from the values on your items, A to Z by default. "All" always comes first. When an item with a new value appears, its option appears too.
 - **The thumb** stretches from the old option to the new one, then squashes into place. You can drag or flick it. With reduced motion turned on, it jumps with no animation.
 - **Search** matches as you type, and works together with the options.
+- **Pagination (optional):** filters every item first, then shows a page of matches, like 12 at a time, with Previous, Next and page numbers you design.
 - **Keyboard:** Tab reaches the options, and the arrow keys, Home and End move between them.
 - **Wrapping:** if the options wrap onto more lines, the thumb stretches between lines.
 - **Late-loading items:** items added after the page loads (by Finsweet List Load, for example) are picked up and filtered automatically.
@@ -110,7 +111,26 @@ Your Collection List, grid and cards stay yours. Add these:
 
 Let the grid place items automatically. If you pin items to specific cells, hidden items leave holes.
 
-### Step 5: Optional settings on the bar
+### Step 5: Pagination (optional)
+
+The bar filters every item first, then shows one page of the matches. A filter or search change goes back to page 1, and the page numbers always match the filtered results.
+
+**Use this instead of Webflow's own pagination.** Webflow's "Paginate items" sends only one page of cards to the browser, so the filter could only see those. Keep every item on the page: turn pagination off on the Collection List (up to 100 items), or use [Finsweet List Load](#more-than-100-items-finsweet-list-load) past 100.
+
+1. Below your grid, add a **Div Block** (or a Nav) for the pager and give it your class.
+2. Add `data-filter-pagination` = `advisors` and `data-filter-page-size` = `12`.
+3. Inside it, add a **Button** for Previous with `data-filter-prev` = `true`, and one for Next with `data-filter-next` = `true`.
+4. Between them, add a **Div Block** for the page numbers with `data-filter-pages` = `true`.
+5. Inside that, add one **Button** and type **1**. Give it `data-filter-page` = `true`. Every page number is copied from it.
+6. Optional: add a **Text Block** with "…" and `data-filter-page-gap` = `true`. With more than 7 pages, the pager shows the first page, the last page and the pages next to the current one, with "…" between them. Without it, every page number shows.
+
+**States you style in Webflow:** the current page gets the class `is-current`, and Previous or Next gets `is-disabled` at either end. Create them as combo classes on your page button and Previous and Next buttons, and style them. To use other names, add `data-filter-current-class` or `data-filter-disabled-class` to the pager.
+
+- The pager hides itself when everything fits on one page.
+- Optional: a Text Block with `data-filter-range` = `advisors` shows "Showing 13 to 24 of 100."
+- Changing pages scrolls back to the bar when it's above the screen. If you have a sticky header, give the bar a top **scroll margin** so the header doesn't cover it.
+
+### Step 6: Optional settings on the bar
 
 Add these to the bar element:
 
@@ -123,7 +143,7 @@ Add these to the bar element:
 
 **Focus ring:** on the bar's class, add the custom properties `--filter-focus` (color) and `--filter-focus-offset`. Without them, it uses the current text color, 2px out.
 
-### Step 6: Publish and test
+### Step 7: Publish and test
 
 Publish to your **webflow.io staging** domain, since custom code doesn't run in the Designer or Preview mode. Then check:
 
@@ -132,6 +152,7 @@ Publish to your **webflow.io staging** domain, since custom code doesn't run in 
 - [ ] Search filters as you type, and Enter doesn't reload the page.
 - [ ] The count updates, and the empty message shows only when nothing matches.
 - [ ] Tab and the arrow keys move between the options.
+- [ ] Previous, Next and the page numbers change pages, and a new filter goes back to page 1.
 - [ ] With Reduce Motion on, the thumb jumps with no animation.
 - [ ] The layout holds at 320px, 768px and desktop.
 
@@ -143,7 +164,7 @@ Instead of Step 1, paste the script once for every page:
 2. Type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 3. Save and publish.
 
-On pages with no filter bar, it does nothing. Steps 2 to 6 stay the same on each page with a bar.
+On pages with no filter bar, it does nothing. Steps 2 to 7 stay the same on each page with a bar.
 
 **Moving from page to site later:** add it to Site settings, then delete it from each page. Leaving both won't break anything, because the script skips a bar it has already set up, but it would load twice.
 
@@ -175,7 +196,7 @@ A Collection List shows at most 100 items per page, and the filter only sees ite
 1. In **Site settings**, then **Custom code**, then **Head code**, add:
    `<script async type="module" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" fs-list></script>`
 2. On the **Collection List**, add `fs-list-element` = `list` and `fs-list-load` = `all`.
-3. Turn on **Paginate items** in the Collection List settings. List Load needs Webflow's pagination to find the other pages.
+3. Turn on **Paginate items** in the Collection List settings. List Load needs Webflow's pagination to find the other pages. Set it to 100 items per page, so List Load makes fewer requests. The filter bar's own pager decides how many cards people see.
 4. Set the pagination element to **display: none**.
 
 Check that nested Collection Lists (like states inside each item) come through on the loaded items. Finsweet's List Load page doesn't cover nested lists.
@@ -186,6 +207,7 @@ Check that nested Collection Lists (like states inside each item) come through o
 |---|---|
 | Nothing happens | The script isn't in Footer code or the page's Before `</body>` field, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
 | Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
+| Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 5). |
 | The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
 | Empty gaps in the grid | `data-filter-item` is on the card instead of the Collection Item, or items are pinned to grid cells |
