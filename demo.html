@@ -33,8 +33,8 @@
     .filter-bar { width: auto; }
     .filter-search { flex-basis: 100%; width: auto; max-width: none; padding: 3px 3px 0; }
     .filter-search svg { top: calc(50% + 1.5px); }
-    .filter-options { flex-basis: 100%; }
-    .filter-option { padding-left: 4px; padding-right: 4px; }
+    .filter-options { flex-basis: 100%; justify-content: center; }
+    .filter-option { flex-grow: 0; padding-left: 4px; padding-right: 4px; }
   }
 
   /* Cards: your own grid and card design */
@@ -56,7 +56,7 @@
   .pager-page, .pager-step { display: grid; place-items: center; min-width: 44px; height: 44px; padding: 0 12px; border-radius: 10px; color: #fff; font-weight: 600; text-decoration: none; }
   .pager-page:hover, .pager-step:hover { background: rgba(255,255,255,.12); }
   .pager-page.is-current { background: #fff; color: #0b2f47; }
-  .pager-step.is-disabled { opacity: .4; pointer-events: none; }
+  .pager-step.is-disabled { pointer-events: none; }
   .pager-gap { display: grid; place-items: center; min-width: 24px; height: 44px; color: rgba(255,255,255,.82); }
   .pager a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .hide { display: none; }

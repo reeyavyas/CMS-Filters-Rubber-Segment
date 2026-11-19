@@ -85,8 +85,10 @@ These Style panel settings center the bar, keep it only as wide as it needs to b
 | Search wrapper | Flex child, Custom: grow `1000`, shrink `1`, basis `240px`. Width and max width: 400px. |
 | Options track | Flex child, Custom: grow `1`, shrink `1`, basis Auto |
 | "All" option | Flex child, Custom: grow `1` |
+| Options track, below 720px | Justify center |
+| "All" option, below 720px | Flex child, Custom: grow `0` |
 
-The high grow on the search wrapper lets it take spare space first, up to its 400px cap. The track takes whatever is left, and the options share it equally. Without a search field, the options spread across the bar's 700px minimum on desktop.
+The high grow on the search wrapper lets it take spare space first, up to its 400px cap. The track takes whatever is left, and the options share it equally. Without a search field, the options spread across the bar's 700px minimum on desktop. Below 720px, the bar stays full width and each line of options keeps its natural width, centered, so a short last line stays short.
 
 ### Step 3: Count and empty message (optional)
 
