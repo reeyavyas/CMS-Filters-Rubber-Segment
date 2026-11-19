@@ -94,15 +94,16 @@
   </nav>
 
   <script>
-    // Demo only: stands in for a Webflow Collection List of 100 made-up advisors
+    // Demo only: stands in for a Webflow Collection List of 100 made-up advisors across 8 states.
+    // Every 4th advisor also works in a second state, so state counts differ and some cards wrap.
     (() => {
       const first = ['Dana', 'Marcus', 'Priya', 'Tom', 'Elena', 'Grant', 'Keisha', 'Owen', 'Rosa', 'Felix'];
       const last = ['Whitfield', 'Oyelaran', 'Raman', 'Hollister', 'Vasquez', 'Pemberton', 'Monroe', 'Calder', 'Ibarra', 'Lindqvist'];
-      const offices = [['Evansville, IN', 'Indiana'], ['Lexington, KY', 'Kentucky'], ['Murfreesboro, TN', 'Tennessee'], ['Jasper, IN', 'Indiana'], ['Owensboro, KY', 'Kentucky'], ['Knoxville, TN', 'Tennessee']];
+      const offices = [['Evansville, IN', 'Indiana'], ['Lexington, KY', 'Kentucky'], ['Murfreesboro, TN', 'Tennessee'], ['Columbus, OH', 'Ohio'], ['Springfield, IL', 'Illinois'], ['Atlanta, GA', 'Georgia'], ['Detroit, MI', 'Michigan'], ['Charlotte, NC', 'North Carolina']];
       const html = [];
       for (let i = 0; i < 100; i++) {
         const name = `${first[i % 10]} ${last[Math.floor(i / 10)]}`;
-        const [city, state] = offices[i % 6], [alsoCity, alsoState] = offices[(i + 1) % 6];
+        const [city, state] = offices[i % offices.length], [alsoCity, alsoState] = offices[(i + 3) % offices.length];
         const also = i % 4 === 0;
         const title = i % 9 === 0 ? 'Wealth Advisor, Regional Manager' : 'Wealth Advisor';
         html.push(`<div role="listitem" data-filter-item="advisors"><div class="card">
@@ -134,6 +135,6 @@
 </main>
 
 <!-- In Webflow this goes in Site settings > Custom code > Footer code -->
-<script src="webflow/filter-bar.js"></script>
+<script src="webflow/filter-bar.js?v=pager"></script>
 </body>
 </html>
