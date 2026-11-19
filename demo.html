@@ -96,7 +96,6 @@
   <script>
     // Demo only: stands in for a Webflow Collection List of 100 made-up advisors across 8 states.
     // Every 4th advisor also works in a second state, so state counts differ and some cards wrap.
-    // Values show two-letter codes ("IN"); data-filter-name gives screen readers and the count the full name.
     (() => {
       const first = ['Dana', 'Marcus', 'Priya', 'Tom', 'Elena', 'Grant', 'Keisha', 'Owen', 'Rosa', 'Felix'];
       const last = ['Whitfield', 'Oyelaran', 'Raman', 'Hollister', 'Vasquez', 'Pemberton', 'Monroe', 'Calder', 'Ibarra', 'Lindqvist'];
@@ -111,7 +110,7 @@
           <div class="card-photo" data-fit-photo>${name.split(' ').map(w => w[0]).join('')}</div>
           <div class="card-body"><h3 class="card-name" data-filter-search-text data-fit-text>${name}</h3><p class="card-title" data-filter-search-text data-fit-text>${title}</p></div>
           <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>${city}</div>${also ? `<div data-filter-search-text>Also ${alsoCity}</div>` : ''}</div>
-          <div class="hide"><span data-filter-value data-filter-name="${state}">${city.slice(-2)}</span>${also && alsoState !== state ? `<span data-filter-value data-filter-name="${alsoState}">${alsoCity.slice(-2)}</span>` : ''}</div>
+          <div class="hide"><span data-filter-value>${state}</span>${also && alsoState !== state ? `<span data-filter-value>${alsoState}</span>` : ''}</div>
         </div></div>`);
       }
       document.getElementById('advisorGrid').innerHTML = html.join('');
@@ -136,6 +135,6 @@
 </main>
 
 <!-- In Webflow this goes in Site settings > Custom code > Footer code -->
-<script src="webflow/filter-bar.js?v=names"></script>
+<script src="webflow/filter-bar.js?v=fullnames"></script>
 </body>
 </html>

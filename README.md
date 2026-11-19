@@ -9,7 +9,7 @@ You design every part in the Webflow Designer with your own classes. One script 
 | File | What it is |
 |---|---|
 | `webflow/filter-bar.js` | The whole component. Paste it into Webflow, wrapped in a script tag. |
-| `demo.html` | Two working bars with made-up sample data: 100 advisors across 8 states (shown as two-letter codes) at 12 per page, and events by type. Its `<style>` block stands in for the classes you build in Webflow. |
+| `demo.html` | Two working bars with made-up sample data: 100 advisors across 8 states at 12 per page, and events by type. Its `<style>` block stands in for the classes you build in Webflow. |
 
 ## How it behaves
 
@@ -36,7 +36,7 @@ Every attribute goes in **Element settings**, under **Custom attributes**. Where
 4. Save.
 
 - **Use the Before `</body>` field, not the head field.** The bar and items need to be on the page when the script runs.
-- **Plan and size:** you need a paid site plan for custom code. The script is about 15,000 characters, and the field allows 50,000.
+- **Plan and size:** you need a paid site plan for custom code. The script is about 20,000 characters, and the field allows 50,000.
 - **CMS template pages:** the script runs for every item that uses the template.
 - **Other pages:** each page with a bar needs its own copy.
 
@@ -110,7 +110,7 @@ Your Collection List, grid and cards stay yours. Add these:
 | `data-filter-item` = `advisors` | Each **Collection Item** (the grid's direct child, not the card inside it) |
 | `data-filter-value` = `true` | Each value the item belongs to, like a state or category. For a multi-reference field, use a nested Collection List with a Text bound to Name. For an Option or text field, bind one Text. Hide them with display: none if they shouldn't show. |
 | `data-filter-search-text` = `true` (optional) | Each text search should look at. Without it, search looks at all of the item's text. |
-| `data-filter-name` (optional) | The same Text as `data-filter-value`, when it shows a short label like "IN." Bind the attribute's value to the CMS field with the full name, like "Indiana." Screen readers announce the full name, and the count reads "13 advisors in Indiana." |
+| `data-filter-name` (optional, for later) | Skip this while your values are full names. Use it only if you switch to short labels like "IN": add it to the same Text as `data-filter-value`, and bind the attribute's value to the CMS field with the full name, like "Indiana." Screen readers announce the full name, and the count reads "13 advisors in Indiana." |
 
 Let the grid place items automatically. If you pin items to specific cells, hidden items leave holes.
 
@@ -156,6 +156,7 @@ Publish to your **webflow.io staging** domain, since custom code doesn't run in 
 - [ ] The count updates, and the empty message shows only when nothing matches.
 - [ ] Tab and the arrow keys move between the options.
 - [ ] Previous, Next and the page numbers change pages, and a new filter goes back to page 1.
+- [ ] Each page shows no more than your page size, and the pager hides when everything fits on one page.
 - [ ] With Reduce Motion on, the thumb jumps with no animation.
 - [ ] The layout holds at 320px, 768px and desktop.
 
