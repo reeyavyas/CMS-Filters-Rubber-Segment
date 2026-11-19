@@ -69,7 +69,7 @@ Pick a **group name** first, for example `advisors`. It ties a bar to its items,
 Don't bind the track to the CMS. The script adds one option for each value you tag in [Step 4](#step-4-connect-your-items).
 
 **The search field (optional)**
-1. Inside the track, as its **first** child, add a **Form Block**. Putting search inside the track lets the filters fill the rest of its line, and only the ones that don't fit wrap to the next line.
+1. Inside the track, as its **first** child, add a **Form Block**. Filters then fill the rest of the search field's line, and any that don't fit wrap to the next line, starting under the search field.
 2. Delete the submit button and the success and error messages.
 3. Style the **Input** with your class.
 4. On the Input, add `data-filter-search` = `true`. Pressing Enter won't submit the form.
@@ -87,20 +87,23 @@ Don't bind the track to the CMS. The script adds one option for each value you t
 
 **Recommended layout**
 
-These Style panel settings center the bar, keep it only as wide as it needs to be, keep search on the same line as the first filters, and spread the options evenly when there's room. They're what `demo.html` uses.
+These Style panel settings center the bar, keep it only as wide as it needs to be, keep search on the first line on every iPad and desktop, and start wrapped filters under the search field. They're what `demo.html` uses. The breakpoint names are Webflow's.
 
-| Element | Setting |
-|---|---|
-| Bar | Width: `fit-content`. Max width: 100%. Left and right margin: Auto. |
-| Bar, desktop only (wider than 1024px) | Min width: 700px |
-| Bar, below 720px | Width: Auto |
-| Options track | Display: Flex, wrap, justify center, align center |
-| Search Form Block | Flex child, Custom: grow `1000`, shrink `0`, basis `240px`. Width and max width: 400px. Right margin: 12px. |
-| "All" option | Flex child, Custom: grow `1` |
-| Search Form Block, below 720px | Flex child basis: 100%. Width: Auto. Max width: None. Right margin: 0. Bottom margin: 8px. |
-| "All" option, below 720px | Flex child, Custom: grow `0` |
+| Breakpoint | Element | Setting |
+|---|---|---|
+| Desktop (base) | Bar | Width: `fit-content`. Max width: 100%. Min width: 700px. Left and right margin: Auto. |
+| Desktop (base) | Options track | Display: Flex, wrap, justify start, align center |
+| Desktop (base) | Search Form Block | Flex child, Custom: grow `1000`, shrink `0`, basis `240px`. Width and max width: 400px. Right margin: 12px. |
+| Desktop (base) | "All" option | Left and right padding: 48px. Flex child: none, so it keeps its natural width. |
+| Desktop (base) | "All" option on a bar without search | Add a combo class, like `is-spread`, with flex grow `1`, so the options share the bar's width evenly |
+| Tablet | Bar | Min width: None |
+| Tablet | "All" option | Left and right padding: 24px |
+| Mobile portrait | Bar | Width: Auto |
+| Mobile portrait | Options track | Justify center |
+| Mobile portrait | Search Form Block | Flex child basis: 100%. Width: Auto. Max width: None. Right margin: 0. Bottom margin: 8px. |
+| Mobile portrait | "All" option (and `is-spread`) | Left and right padding: 4px. Flex grow `0`. |
 
-The search field starts at 240px, so filters fill the rest of the first line. Its high grow then lets it take spare space first, up to 400px, and the filters share what's left. Without a search field, the options spread across the bar's 700px minimum on desktop. Below 720px, search sits on its own line on top, and each line of options keeps its natural width, centered.
+Tablet settings carry down to Mobile landscape, so search stays on the first line on every iPad and on phones held sideways. Only Mobile portrait (478px and below) puts search on its own line. The search field starts at 240px and grows to 400px when its line has room.
 
 ### Step 3: Count and empty message (optional)
 
@@ -226,7 +229,7 @@ Check that nested Collection Lists (like states inside each item) come through o
 | Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 5). |
 | The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
-| Search sits on its own line on desktop | The search Form Block is outside the options track. Move it inside, as the track's first child. |
+| Search sits on its own line on a tablet or desktop | The search Form Block is outside the options track, or its Mobile portrait settings were set on a larger breakpoint. Move it inside the track as the first child, and keep the full-width settings on Mobile portrait only. |
 | An extra gap inside the bar | The Code Embed sits inside the bar. Move it beside the bar. |
 | Empty gaps in the grid | `data-filter-item` is on the card instead of the Collection Item, or items are pinned to grid cells |
 | Enter reloads the page | The Input isn't the one with `data-filter-search` |
