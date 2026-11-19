@@ -24,156 +24,278 @@ You design every part in the Webflow Designer with your own classes. One script 
 
 ## Build a bar
 
-These steps get a bar working on one page. To use it across the whole site instead, see [Use it on the whole site](#use-it-on-the-whole-site).
+These steps build one bar for the advisors list. Everything you see is a normal Webflow element with your own class. The script only adds behavior. Where a step names a class, like `filter-bar`, use that name or your own.
 
-Every attribute goes in **Element settings**, under **Custom attributes**. Where the value doesn't matter, use `true`.
+### What you'll end up with
+
+This is the finished structure in the **Navigator** panel. Indents show what sits inside what.
+
+```
+Filter (Component)                  filter-wrapper
+├─ Bar                              filter-bar       data-filter-bar = advisors
+│  └─ Options track                 filter-options   data-filter-options = true
+│     ├─ Search Form Block          filter-search
+│     │  └─ Input                   filter-input     data-filter-search = true
+│     ├─ "All" option (Button)      filter-option    data-filter-option = true
+│     └─ Thumb (empty Div Block)    filter-thumb     data-filter-thumb = true
+├─ Count text                       filter-status    data-filter-status = advisors
+├─ Empty message                    filter-empty     data-filter-empty = advisors
+└─ Code Embed (the script)          hidden           (display: none)
+
+Advisors Collection List            your grid        (Step 5)
+└─ Collection Item                                   data-filter-item = advisors
+   └─ your card …                                    data-filter-value on the state names
+
+Pager (optional)                    pager            data-filter-pagination = advisors   (Step 6)
+```
+
+### How to add a custom attribute
+
+You'll do this for most elements, so here it is once:
+
+1. Select the element on the canvas or in the Navigator.
+2. Open the **Element settings** panel (the gear icon in the right sidebar, or press **D**).
+3. Scroll to **Custom attributes** and click **+**.
+4. Type the **Name** (for example `data-filter-bar`) and the **Value** (for example `advisors`).
+5. Click **Save**.
+
+Where a value doesn't matter, type `true`.
 
 ### Step 1: Add the script
 
-Pick one. You need a paid site plan for custom code. The script is about 20,000 characters, and each place below allows 50,000.
+Pick one option. You need a paid site plan for custom code. The script is about 20,000 characters, and each place below allows 50,000.
 
 **Option A: a Code Embed in a Component (recommended)**
 
-This keeps page settings empty, and the script travels with the bar wherever you use it.
+The script then travels with the bar, and page settings stay empty.
 
-1. Make a **Div Block** to hold the whole filter (bar, count and pager), and turn it into a **Component**.
-2. Inside the Component, **beside the bar, not inside it**, add a **Code Embed**. Webflow wraps every Embed in its own div, and inside the bar that div would add an extra gap.
-3. In the Embed, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
-4. Give the Embed a class set to **display: none**. The script still runs.
+1. Add a **Div Block** to the page where the bar should go. Give it the class `filter-wrapper`. You'll put the bar, count and empty message inside it in the next steps.
+2. From the **Add** panel, drag a **Code Embed** inside `filter-wrapper`, **beside where the bar will go, not inside the bar**. Webflow wraps every Embed in its own div, and inside the bar that div would add an extra gap.
+3. In the code window, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`. Click **Save & Close**.
+4. Give the Embed the class `hidden` and set **Display: None** in the Style panel. The script still runs.
+5. When Steps 2 to 4 are done, right-click `filter-wrapper` and choose **Create component**, so you can reuse the whole filter on other pages.
 
-The Embed can sit above or below the bar. The script waits for the page to finish loading. Using the Component more than once on a page is fine, because the script runs only once.
+The Embed can sit above or below the bar. The script waits for the page to finish loading, and it runs only once even if the Component appears twice on a page.
 
 **Option B: page settings**
 
 1. In the **Pages** panel, hover over the page and click its **gear icon**.
 2. Scroll to **Custom Code**.
 3. In **Before `</body>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
-4. Save.
+4. Click **Save**.
 
-Use the Before `</body>` field, not the head field. On a CMS template page, the script runs for every item that uses the template, and each page with a bar needs its own copy.
+Use the Before `</body>` field, not the head field. On a CMS template page, the script runs for every item that uses the template. Each page with a bar needs its own copy.
 
 ### Step 2: Build the bar
 
-Pick a **group name** first, for example `advisors`. It ties a bar to its items, count and empty message, so two bars on one page never interfere.
+Pick a **group name** first. These steps use `advisors`. The group name ties the bar to its items, count, empty message and pager, so two bars on one page never interfere.
 
-**The bar**
-1. Add a **Div Block** and give it your class. This is the outer background.
-2. Add `data-filter-bar` = `advisors`.
-3. Optional: add `data-filter-label` = `Filter advisors by state`. This is what screen readers announce.
+Build each element at the **Desktop** breakpoint first (the base, with the desktop icon selected at the top of the canvas). Then make the Tablet and Mobile portrait changes listed under each element. Webflow carries a breakpoint's settings down to the smaller ones, so Tablet settings also apply to Mobile landscape.
 
-**The options track**
-1. Inside the bar, add a **Div Block** for the track.
-2. Style it with your class. Its **padding** is the space between the thumb and the track's edge, and its flex and wrap settings decide how everything inside lays out.
-3. Add `data-filter-options` = `true`.
+#### 2a. The bar
 
-Don't bind the track to the CMS. The script adds one option for each value you tag in [Step 4](#step-4-connect-your-items).
+This is the outer background around everything.
 
-**The search field (optional)**
-1. Inside the track, as its **first** child, add a **Form Block**. Filters then fill the rest of the search field's line, and any that don't fit wrap to the next line, starting under the search field.
-2. Delete the submit button and the success and error messages.
-3. Style the **Input** with your class.
-4. On the Input, add `data-filter-search` = `true`. Pressing Enter won't submit the form.
+1. Inside `filter-wrapper`, add a **Div Block**. Give it the class `filter-bar`.
+2. Add the attribute `data-filter-bar` = `advisors`.
+3. Optional: add `data-filter-label` = `Filter advisors by state`. Screen readers announce this as the name of the filter group.
+4. Style it:
 
-**The "All" option**
-1. Inside the track, after the search field, add a **Button** (or a Link Block or Div) and type **All**.
-2. Style it as an **inactive** option: padding, font, idle text color and breakpoints. Every other option is copied from it.
-3. Add `data-filter-option` = `true`.
-4. If the label sits in a Text Block inside a Link Block, add `data-filter-option-label` = `true` to the Text Block.
-
-**The thumb**
-1. Inside the track, add an empty **Div Block**.
-2. Style only its **background color**, **text color** (the active label color) and **corner radius**. The script handles its size, position and labels.
-3. Add `data-filter-thumb` = `true`.
-
-**Recommended layout**
-
-These Style panel settings center the bar, keep it only as wide as it needs to be, keep search on the first line on every iPad and desktop, and start wrapped filters under the search field. They're what `demo.html` uses. The breakpoint names are Webflow's.
-
-| Breakpoint | Element | Setting |
-|---|---|---|
-| Desktop (base) | Bar | Width: `fit-content`. Max width: 100%. Min width: 700px. Left and right margin: Auto. |
-| Desktop (base) | Options track | Display: Flex, wrap, justify start, align center. Row gap: 8px (the space between lines). |
-| Desktop (base) | Search Form Block | Flex child, Custom: grow `1000`, shrink `0`, basis `240px`. Width and max width: 400px. Right margin: 12px. |
-| Desktop (base) | "All" option | Left and right padding: 48px. Flex child: none, so it keeps its natural width. |
-| Desktop (base) | "All" option on a bar without search | Add a combo class, like `is-spread`, with flex grow `1`, so the options share the bar's width evenly |
-| Tablet | Bar | Min width: None |
-| Tablet | "All" option | Left and right padding: 24px |
-| Mobile portrait | Bar | Width: Auto |
-| Mobile portrait | Options track | Justify center |
-| Mobile portrait | Search Form Block | Flex child basis: 100%. Width: Auto. Max width: None. Right margin: 0. (The track's row gap spaces it from the filters.) |
-| Mobile portrait | "All" option (and `is-spread`) | Left and right padding: 4px. Flex grow `0`. |
-
-Tablet settings carry down to Mobile landscape, so search stays on the first line on every iPad and on phones held sideways. Only Mobile portrait (478px and below) puts search on its own line. The search field starts at 240px and grows to 400px when its line has room.
-
-### Step 3: Count and empty message (optional)
-
-These can go anywhere on the page.
-
-| Element | Attribute | What it does |
-|---|---|---|
-| Text Block for the count | `data-filter-status` = `advisors` | Shows the count, for example "3 advisors in Kentucky" |
-| Same Text Block | `data-filter-noun` = `advisor` | The word for one item |
-| Same Text Block (optional) | `data-filter-noun-plural` | The word for many, if it isn't the noun plus "s" |
-| Any element for "no matches" | `data-filter-empty` = `advisors` | Shown only when nothing matches |
-
-### Step 4: Connect your items
-
-Your Collection List, grid and cards stay yours. Add these:
-
-| Attribute | Goes on |
+| Breakpoint | Style panel settings |
 |---|---|
-| `data-filter-item` = `advisors` | Each **Collection Item** (the grid's direct child, not the card inside it) |
-| `data-filter-value` = `true` | Each value the item belongs to, like a state or category. For a multi-reference field, use a nested Collection List with a Text bound to Name. For an Option or text field, bind one Text. Hide them with display: none if they shouldn't show. |
-| `data-filter-search-text` = `true` (optional) | Each text search should look at. Without it, search looks at all of the item's text. |
-| `data-filter-name` (optional, for later) | Skip this while your values are full names. Use it only if you switch to short labels like "IN": add it to the same Text as `data-filter-value`, and bind the attribute's value to the CMS field with the full name, like "Indiana." Screen readers announce the full name, and the count reads "13 advisors in Indiana." |
+| Desktop | **Size:** Width `fit-content`, Min W `700px`, Max W `100%`. **Spacing:** padding 8px on all sides, margin left and right Auto. **Backgrounds:** your bar color. **Borders:** your corner radius. |
+| Tablet | **Size:** Min W None |
+| Mobile portrait | **Size:** Width Auto |
 
-Let the grid place items automatically. If you pin items to specific cells, hidden items leave holes.
+`fit-content` keeps the bar only as wide as it needs to be, and Auto margins center it. Type `fit-content` straight into the Width field. If your Webflow version won't accept it, leave Width on Auto; the bar then fills its container.
 
-### Step 5: Pagination (optional)
+#### 2b. The options track
+
+This holds the search field, the filters and the thumb, and decides how they wrap.
+
+1. Inside the bar, add a **Div Block**. Give it the class `filter-options`.
+2. Add the attribute `data-filter-options` = `true`.
+3. Style it:
+
+| Breakpoint | Style panel settings |
+|---|---|
+| Desktop | **Layout:** Display Flex, Direction Horizontal, Align Center, Justify Start, **Wrap children** on, row gap `8px`. **Spacing:** padding 3px on all sides. **Borders:** radius matching the bar's. |
+| Mobile portrait | **Layout:** Justify Center |
+
+The 3px padding is the space between the thumb and the track's edge. The 8px row gap is the space between lines of filters.
+
+Don't bind the track to the CMS or add a filter for each state. The script adds one filter for each value you tag on your items in [Step 5](#step-5-connect-your-items).
+
+#### 2c. The search field (optional)
+
+Putting the search field **inside the track, as its first child**, lets the filters fill the rest of its line. Filters that don't fit wrap to the next line, starting under the search field.
+
+1. From the **Add** panel, drag a **Form Block** inside the track, above everything else in it. Give the form the class `filter-search`.
+2. Inside the Form Block, delete the **Submit button**, the **Success message** and the **Error message**. If it has a **Field label**, delete that too.
+3. Select the **Input**. In Element settings, set **Type** to Plain, clear its **Name** if you like, and type a **Placeholder**, like "Search by name or city."
+4. On the Input, add the attribute `data-filter-search` = `true`. Pressing Enter won't submit the form.
+5. Also on the Input, add `aria-label` = `Search advisors`, so screen readers know what the field does without a visible label.
+6. Give the Input the class `filter-input` and style how it looks: height (38px matches the filters), padding, background, text color, placeholder color and corner radius.
+7. Style the Form Block:
+
+| Breakpoint | Style panel settings |
+|---|---|
+| Desktop | **Layout (Flex Child):** Custom, Grow `1000`, Shrink `0`, Basis `240px`. **Size:** Width `400px`, Max W `400px`. **Spacing:** margin right 12px, all other margins 0. |
+| Mobile portrait | **Layout (Flex Child):** Basis `100%`. **Size:** Width Auto, Max W None. **Spacing:** margin right 0. |
+
+The search field starts at 240px wide. If its line has room left after the filters, it grows first, up to 400px. On Mobile portrait it takes a full line of its own, and the row gap spaces it from the filters.
+
+Optional: to show a magnifying glass, place your icon inside the Form Block, set it to **Position: Absolute**, about 12px from the left and centered vertically, and give the Input enough left padding (about 40px) so the text clears it.
+
+#### 2d. The "All" option
+
+This is the only filter you build. It's the template the script copies for every state, so **style it as an inactive filter**.
+
+1. Inside the track, after the search field, add a **Button**. Change its text to **All**.
+2. Give it the class `filter-option`.
+3. Add the attribute `data-filter-option` = `true`.
+4. Style it:
+
+| Breakpoint | Style panel settings |
+|---|---|
+| Desktop | **Layout:** Display Grid (or Flex), centered. **Spacing:** padding 8px top and bottom, 48px left and right. **Typography:** your font, weight and size, line height 22px, **Color: your inactive text color**, no wrap. **Backgrounds:** none. **Layout (Flex Child):** Don't shrink or grow. |
+| Tablet | **Spacing:** padding 24px left and right |
+| Mobile portrait | **Spacing:** padding 4px left and right |
+
+Leave the Button's link as it is. The script stops it from jumping the page.
+
+If you use a **Link Block** with a Text Block inside instead of a Button, put `data-filter-option-label` = `true` on the Text Block, so the script knows where to write each state's name.
+
+**For a bar without a search field:** add a combo class to the "All" option, like `is-spread`, and set its **Flex Child** to Grow `1` on Desktop and back to Don't grow on Mobile portrait. The filters then share the bar's width evenly. Every filter the script makes copies the combo class too.
+
+#### 2e. The thumb
+
+The thumb is the white (or any color) shape that slides behind the active filter.
+
+1. Inside the track, add a **Div Block** as the **last** child, after the "All" option. Leave it empty.
+2. Give it the class `filter-thumb`.
+3. Add the attribute `data-filter-thumb` = `true`.
+4. Style only three things:
+   - **Backgrounds:** the active filter's background color.
+   - **Typography:** Color set to **the active filter's text color**. This is the "text color change" (see Step 3).
+   - **Borders:** the active filter's corner radius. 7px fits inside a 10px track with 3px padding.
+
+Don't set its size, position, padding or display. The script makes it cover the track, places a copy of every filter label inside it, and clips it to the active filter.
+
+**In the Designer, the thumb looks empty or invisible.** That's expected. Custom code doesn't run in the Designer, so you'll only see "All" in the track, with no thumb behind it. Everything appears on the published site.
+
+### Step 3: Set the inactive and active colors
+
+Two elements decide the filters' colors. You don't need an "active" class or an Interaction.
+
+| State | What changes | Where you set it |
+|---|---|---|
+| Inactive filters | Text color | The **"All" option's** class (`filter-option`), Typography Color |
+| Active filter | Text color | The **thumb's** class (`filter-thumb`), Typography Color |
+| Active filter | Background color | The **thumb's** class, Backgrounds Color |
+| Active filter | Corner radius | The **thumb's** class, Borders Radius |
+
+How it works: the thumb holds a copy of every filter label, and those copies take the thumb's text color. The thumb shows only behind the active filter, so that filter's label appears in your active color while the others keep their inactive color. When someone picks another filter, the thumb slides over, and the new filter's label changes color with it.
+
+**Check the contrast** of both pairs: your inactive text color on the bar's background, and your active text color on the thumb's background.
+
+The bounce needs nothing from you either. Don't add Webflow Interactions to the thumb or the filters. The script already moves the thumb, and an Interaction would fight with it.
+
+### Step 4: Count and empty message (optional)
+
+Both can go anywhere on the page. Inside `filter-wrapper`, under the bar, is a good spot.
+
+**The count**
+1. Add a **Text Block** with the class `filter-status`. Leave its text empty, or type a placeholder. The script replaces it.
+2. Add `data-filter-status` = `advisors`.
+3. Add `data-filter-noun` = `advisor`. It shows as "13 advisors in Indiana."
+4. Optional: add `data-filter-noun-plural` if the plural isn't the noun plus "s," like `people` for `person`.
+
+**The empty message**
+1. Add a **Text Block** (or any element) with the class `filter-empty`. Type what people see when nothing matches, like "No advisors match. Try a different name, city or state."
+2. Add `data-filter-empty` = `advisors`. The script hides it until nothing matches.
+
+### Step 5: Connect your items
+
+Your Collection List, grid and cards stay exactly as you design them. You only add attributes.
+
+**The list**
+1. Select your advisors **Collection List**. In its settings, make sure **pagination is off** and no item limit cuts advisors off. The filter only sees cards that are on the page (see Step 6 for paging).
+2. Let your grid place items automatically. If you pin items to specific grid cells, hidden cards leave holes.
+
+**Each item**
+1. Select the **Collection Item** (the grid's direct child, not the card inside it).
+2. Add `data-filter-item` = `advisors`. The script hides and shows this element.
+
+**The states each advisor belongs to**
+1. Inside the Collection Item, add a **Collection List** and set its source to the advisor's **States** field (the multi-reference).
+2. Inside it, add a **Text Block** and bind it to the state's **Name**.
+3. On that Text Block, add `data-filter-value` = `true`.
+4. Give the nested list's wrapper a class with **Display: None**, so the names don't show on the card.
+5. If your states are an Option field instead of a multi-reference, add one Text Block bound to that field, with `data-filter-value` = `true`, and hide it.
+
+**What search looks at (optional)**
+1. On each text search should match, like the name, title, home office and secondary office cities, add `data-filter-search-text` = `true`.
+2. Without any of these, search looks at all of the item's text.
+
+**Short labels (optional, for later)**
+If you switch to short labels like "IN," add `data-filter-name` to the same Text Block as `data-filter-value`, and bind the attribute's value to the CMS field with the full name, like "Indiana." Screen readers then announce "Indiana," and the count reads "13 advisors in Indiana." Skip this while your values are full names.
+
+### Step 6: Pagination (optional)
 
 The bar filters every item first, then shows one page of the matches. A filter or search change goes back to page 1, and the page numbers always match the filtered results.
 
 **Use this instead of Webflow's own pagination.** Webflow's "Paginate items" sends only one page of cards to the browser, so the filter could only see those. Keep every item on the page: turn pagination off on the Collection List (up to 100 items), or use [Finsweet List Load](#more-than-100-items-finsweet-list-load) past 100.
 
-1. Below your grid, add a **Div Block** (or a Nav) for the pager and give it your class.
+1. Below your grid, add a **Div Block** for the pager. Give it the class `pager`, and lay it out as you like, for example Display Flex, centered, 8px gap.
 2. Add `data-filter-pagination` = `advisors` and `data-filter-page-size` = `12`.
-3. Inside it, add a **Button** for Previous with `data-filter-prev` = `true`, and one for Next with `data-filter-next` = `true`.
-4. Between them, add a **Div Block** for the page numbers with `data-filter-pages` = `true`.
-5. Inside that, add one **Button** and type **1**. Give it `data-filter-page` = `true`. Every page number is copied from it.
-6. Optional: add a **Text Block** with "…" and `data-filter-page-gap` = `true`. With more than 7 pages, the pager shows the first page, the last page and the pages next to the current one, with "…" between them. Without it, every page number shows.
+3. Inside the pager, add a **Button** with the text "Previous" and the class `pager-step`. Add `data-filter-prev` = `true`.
+4. After it, add a **Div Block** with the class `pager-pages` for the page numbers. Add `data-filter-pages` = `true`.
+5. Inside `pager-pages`, add one **Button** with the text **1** and the class `pager-page`. Add `data-filter-page` = `true`. Every page number is copied from it.
+6. Optional: inside `pager-pages`, after the page button, add a **Text Block** with "…" and `data-filter-page-gap` = `true`. With more than 7 pages, the pager then shows the first page, the last page and the pages next to the current one, with "…" between them. Without it, every page number shows.
+7. After `pager-pages`, add a **Button** with the text "Next" and the class `pager-step`. Add `data-filter-next` = `true`.
 
-**States you style in Webflow:** the current page gets the class `is-current`, and Previous or Next gets `is-disabled` at either end. Create them as combo classes on your page button and Previous and Next buttons, and style them. To use other names, add `data-filter-current-class` or `data-filter-disabled-class` to the pager.
+**Style the current page and the ends.** The script adds two classes you style as combo classes:
+- `is-current` on the current page number. Select the page button, type `is-current` in the selector to add it as a combo class, style it (for example a white background), then remove the combo class from that button. The script adds it back on the right page.
+- `is-disabled` on Previous on page 1, and on Next on the last page. Add and style it the same way on a `pager-step` button.
 
+Because no element carries `is-current` or `is-disabled` in the Designer, Webflow's **Clean up** (unused styles) would delete them. Skip Clean up for these two, or keep a hidden style-guide element that uses them.
+
+To use other names, add `data-filter-current-class` or `data-filter-disabled-class` to the pager.
+
+**Also good to know**
 - The pager hides itself when everything fits on one page.
 - Optional: a Text Block with `data-filter-range` = `advisors` shows "Showing 13 to 24 of 100."
 - Changing pages scrolls back to the bar when it's above the screen. If you have a sticky header, give the bar a top **scroll margin** so the header doesn't cover it.
 
-### Step 6: Optional settings on the bar
+### Step 7: Optional settings on the bar
 
-Add these to the bar element:
+Add these to the bar element (`filter-bar`) as custom attributes:
 
 | Attribute | What it does | Default |
 |---|---|---|
 | `data-filter-sort` = `cms` | Keeps the order values first appear in your list | A to Z |
-| `data-filter-duration` | Thumb animation length in ms. `0` turns the animation off. | `420` |
-| `data-filter-squash` | How far the thumb overshoots before settling, in px | `3` |
+| `data-filter-duration` | How long the thumb's move takes, in milliseconds. `0` turns the animation off. | `420` |
+| `data-filter-squash` | How far the thumb overshoots before settling, in px. `0` gives a plain slide. | `3` |
 | `data-filter-field` | A field name, like `state`, for [two bars on one list](#two-bars-on-one-list) | All `data-filter-value` text |
 
-**Focus ring:** on the bar's class, add the custom properties `--filter-focus` (color) and `--filter-focus-offset`. Without them, it uses the current text color, 2px out.
+**Focus ring:** keyboard users see an outline around the track when a filter has focus. To change it, select the bar's class, open **Custom properties** in the Style panel, and add `--filter-focus` (a color) and `--filter-focus-offset` (a length, like `-2px`). Without them, it uses the current text color, 2px out.
 
-### Step 7: Publish and test
+### Step 8: Publish and test
 
-Publish to your **webflow.io staging** domain, since custom code doesn't run in the Designer or Preview mode. Then check:
+Custom code doesn't run in the Designer or Preview mode. Publish to your **webflow.io staging** domain, then check:
 
-- [ ] The options show All, then your values.
-- [ ] Tapping or dragging moves the thumb and filters the items.
+- [ ] The filters show All, then your states, A to Z.
+- [ ] The thumb sits behind All, in your active colors.
+- [ ] Tapping a filter slides the thumb and filters the cards. Dragging the thumb snaps to the nearest filter.
 - [ ] Search filters as you type, and Enter doesn't reload the page.
 - [ ] The count updates, and the empty message shows only when nothing matches.
-- [ ] Tab and the arrow keys move between the options.
+- [ ] Tab reaches the filters, and the arrow keys, Home and End move between them.
 - [ ] Previous, Next and the page numbers change pages, and a new filter goes back to page 1.
 - [ ] Each page shows no more than your page size, and the pager hides when everything fits on one page.
-- [ ] With Reduce Motion on, the thumb jumps with no animation.
-- [ ] The layout holds at 320px, 768px and desktop.
+- [ ] With Reduce Motion turned on in your device settings, the thumb jumps with no animation.
+- [ ] On desktop and every iPad width, search shares its line with the first filters. On a phone held upright, search sits on top.
+- [ ] Nothing scrolls sideways at 320px.
 
 ## Use it on the whole site
 
@@ -183,7 +305,7 @@ Instead of Step 1, paste the script once for every page:
 2. Type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 3. Save and publish.
 
-On pages with no filter bar, it does nothing. Steps 2 to 7 stay the same on each page with a bar.
+On pages with no filter bar, it does nothing. Steps 2 to 8 stay the same on each page with a bar.
 
 **Moving to the whole site later:** add it to Site settings, then delete it from the Component's Embed or from each page. Leaving both won't break anything, because the script runs only once per page, but the extra copy adds to the page's size.
 
@@ -226,7 +348,7 @@ Check that nested Collection Lists (like states inside each item) come through o
 |---|---|
 | Nothing happens | The script isn't in a Code Embed, the page's Before `</body>` field or Footer code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
 | Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
-| Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 5). |
+| Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 6). |
 | The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
 | Search sits on its own line on a tablet or desktop | The search Form Block is outside the options track, or its Mobile portrait settings were set on a larger breakpoint. Move it inside the track as the first child, and keep the full-width settings on Mobile portrait only. |
