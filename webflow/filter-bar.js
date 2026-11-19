@@ -70,6 +70,9 @@
     box.setAttribute('aria-label', bar.dataset.filterLabel || 'Filter');
     thumb.setAttribute('aria-hidden', 'true');
     template.dataset.filterOptionValue = '';
+    // No search field (for example, hidden by a Component visibility property): add the spread combo class,
+    // so one Component works with and without search. Every option is copied from "All", so they all get it.
+    if (!search) template.classList.add(bar.dataset.filterSpreadClass || 'is-spread');
     let slots = [template], active = 0, anim = null, drag = null, suppressClick = false;
     const fullName = new Map();   // value text -> full name from data-filter-name
     const value = () => slots[active].dataset.filterOptionValue;

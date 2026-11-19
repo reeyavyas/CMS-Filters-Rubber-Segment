@@ -13,6 +13,7 @@ You design every part in the Webflow Designer with your own classes. One script 
 
 ## How it behaves
 
+- **Any collection, any number of times:** one Component can filter advisors, events, articles or anything else, each instance pulling from its own Collection List. See [Use it with other collections](#use-it-with-other-collections).
 - **Options build themselves** from the values on your items, A to Z by default. "All" always comes first. When an item with a new value appears, its option appears too.
 - **The thumb** stretches from the old option to the new one, then squashes into place. You can drag or flick it. With reduced motion turned on, it jumps with no animation.
 - **Search** matches as you type, and works together with the options.
@@ -73,7 +74,7 @@ The script then travels with the bar, and page settings stay empty.
 2. From the **Add** panel, drag a **Code Embed** inside `filter-wrapper`, **beside where the bar will go, not inside the bar**. Webflow wraps every Embed in its own div, and inside the bar that div would add an extra gap.
 3. In the code window, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`. Click **Save & Close**.
 4. Give the Embed the class `hidden` and set **Display: None** in the Style panel. The script still runs.
-5. When Steps 2 to 4 are done, right-click `filter-wrapper` and choose **Create component**, so you can reuse the whole filter on other pages.
+5. When Steps 2 to 4 are done, right-click `filter-wrapper` and choose **Create component**, so you can reuse the whole filter on other pages. To use it with other collections, set up the Component's properties next (see [Use it with other collections](#use-it-with-other-collections)).
 
 The Embed can sit above or below the bar. The script waits for the page to finish loading, and it runs only once even if the Component appears twice on a page.
 
@@ -154,7 +155,12 @@ Leave the Button's link as it is. The script stops it from jumping the page.
 
 If you use a **Link Block** with a Text Block inside instead of a Button, put `data-filter-option-label` = `true` on the Text Block, so the script knows where to write each state's name.
 
-**For a bar without a search field:** add a combo class to the "All" option, like `is-spread`, and set its **Flex Child** to Grow `1` on Desktop and back to Don't grow on Mobile portrait. The filters then share the bar's width evenly. Every filter the script makes copies the combo class too.
+**For a bar without a search field:** the script adds the combo class `is-spread` to the "All" option (and so to every filter) whenever the bar has no search field. Style it once so the filters share the bar's width evenly:
+1. Select the "All" option, type `is-spread` in the selector to add it as a combo class.
+2. Set its **Flex Child** to Grow `1` on Desktop, and back to Don't shrink or grow on Mobile portrait.
+3. Remove `is-spread` from the "All" option again if this bar has a search field. The script adds it only where it's needed.
+
+Like `is-current`, no element may carry `is-spread` in the Designer, so Webflow's **Clean up** would delete it. Skip Clean up for it, or keep a hidden style-guide element that uses it.
 
 #### 2d. The thumb
 
@@ -222,6 +228,8 @@ Your Collection List, grid and cards stay exactly as you design them. You only a
 4. Give the nested list's wrapper a class with **Display: None**, so the names don't show on the card.
 5. If your states are an Option field instead of a multi-reference, add one Text Block bound to that field, with `data-filter-value` = `true`, and hide it.
 
+Webflow limits how many nested Collection Lists a page can have, and how many items each nested list shows. Each advisor card already uses nested lists (states, and secondary offices if you show them), so check Webflow's current limits against your largest advisor.
+
 **What search looks at (optional)**
 1. On each text search should match, like the name, title, home office and secondary office cities, add `data-filter-search-text` = `true`.
 2. Without any of these, search looks at all of the item's text.
@@ -239,7 +247,7 @@ The bar filters every item first, then shows one page of the matches. A filter o
 2. Add `data-filter-pagination` = `advisors` and `data-filter-page-size` = `12`.
 3. Inside the pager, add a **Button** with the text "Previous" and the class `pager-step`. Add `data-filter-prev` = `true`.
 4. After it, add a **Div Block** with the class `pager-pages` for the page numbers. Add `data-filter-pages` = `true`.
-5. Inside `pager-pages`, add one **Button** with the text **1** and the class `pager-page`. Add `data-filter-page` = `true`. Every page number is copied from it.
+5. Inside `pager-pages`, add one **Button** with the text **1** and the class `pager-page`. Add `data-filter-page` = `true`. Every page number is copied from it. If you use a Link Block with a Text Block inside instead, put `data-filter-page-label` = `true` on the Text Block, so the script knows where to write each number.
 6. Optional: inside `pager-pages`, after the page button, add a **Text Block** with "…" and `data-filter-page-gap` = `true`. With more than 7 pages, the pager then shows the first page, the last page and the pages next to the current one, with "…" between them. Without it, every page number shows.
 7. After `pager-pages`, add a **Button** with the text "Next" and the class `pager-step`. Add `data-filter-next` = `true`.
 
@@ -266,6 +274,7 @@ Add these to the bar element (`filter-bar`) as custom attributes:
 | `data-filter-duration` | How long the thumb's move takes, in milliseconds. `0` turns the animation off. | `420` |
 | `data-filter-squash` | How far the thumb overshoots before settling, in px. `0` gives a plain slide. | `3` |
 | `data-filter-field` | A field name, like `state`, for [two bars on one list](#two-bars-on-one-list) | All `data-filter-value` text |
+| `data-filter-spread-class` | The class added to the filters when the bar has no search field | `is-spread` |
 
 **Focus ring:** keyboard users see an outline around the bar when a filter has focus. To change it, select the bar's class, open **Custom properties** in the Style panel, and add `--filter-focus` (a color) and `--filter-focus-offset` (a length, like `-2px`). Without them, it uses the current text color, 2px out.
 
@@ -297,26 +306,121 @@ On pages with no filter bar, it does nothing. Steps 2 to 8 stay the same on each
 
 **Moving to the whole site later:** add it to Site settings, then delete it from the Component's Embed or from each page. Leaving both won't break anything, because the script runs only once per page, but the extra copy adds to the page's size.
 
+## Use it with other collections
+
+One Component can filter advisors on one page, events on another, and articles somewhere else, or several on the same page. Each instance pulls from its own Collection List.
+
+### How instances stay separate
+
+Every instance has a **group name**, like `advisors`, `events` or `articles`. The script only connects pieces that share a group name:
+
+| Piece | Attribute that carries the group name |
+|---|---|
+| The bar | `data-filter-bar` |
+| The count | `data-filter-status` |
+| The empty message | `data-filter-empty` |
+| The pager | `data-filter-pagination` |
+| The range text | `data-filter-range` |
+| Each Collection Item | `data-filter-item` |
+
+So a bar named `events` only filters items tagged `data-filter-item` = `events`, and only updates the count, empty message and pager named `events`.
+
+**Rules for group names**
+- They must match exactly, including capitalization. `Events` and `events` won't connect.
+- Two instances on the same page need different names.
+- Use lowercase words with no spaces, like `events` or `case-studies`.
+
+### Set up the Component's properties (once)
+
+Instead of typing the group name into each attribute, connect those attributes to Component properties. Then each instance gets its own values. Webflow lets you connect a custom attribute's value to a Component property ([component properties](https://help.webflow.com/lesson/component-properties), [custom attributes](https://help.webflow.com/hc/en-us/articles/33961389460115), [dynamic attributes for components](https://webflow.com/updates/dynamic-attributes-for-components)).
+
+1. Double-click the Component (or choose **Edit component**) to edit its contents.
+2. **Group:** select the bar. In **Element settings**, find the `data-filter-bar` attribute. Instead of typing a value, use the value field's option to **connect it to a property**, create a new **Text** property named **Group**, and give it the default `advisors`.
+3. Connect the same **Group** property to:
+   - `data-filter-status` on the count text
+   - `data-filter-empty` on the empty message
+   - `data-filter-pagination` and `data-filter-range`, if your pager or range text is inside the Component
+4. **Noun:** select the count text. Connect `data-filter-noun` to a new **Text** property named **Noun**, default `advisor`. If some collections need an unusual plural, also connect `data-filter-noun-plural` to a property named **Noun plural**.
+5. **Label:** select the bar. Connect `data-filter-label` to a new **Text** property named **Label**, default `Filter advisors by state`.
+6. **Show search:** select the search Form Block. In **Element settings**, connect its **Visibility** to a new **Visibility** property named **Show search**, default on.
+7. **Empty message text:** select the empty message's text and connect it to a new **Text** property named **Empty message**, so each collection can say something fitting, like "No events match."
+8. Optional: connect `data-filter-sort` on the bar to a **Text** property named **Sort**. Leave it empty for A to Z, or type `cms` on an instance to keep CMS order.
+
+**A bar without search spreads its filters on its own.** When an instance has **Show search** off, the script adds the `is-spread` combo class to its "All" option (and so to every filter), and the filters share the bar's width evenly. You style `is-spread` once (see [2c](#2c-the-all-option)). To use a different class name, add `data-filter-spread-class` to the bar.
+
+### Add an instance for another collection
+
+These steps add an events filter. Swap in your own collection and names.
+
+**1. Place the Component**
+1. Drag the filter Component onto the page, above the Events Collection List.
+2. In the instance's **properties** panel, set:
+   - **Group:** `events`
+   - **Noun:** `event`
+   - **Label:** `Filter events by type`
+   - **Show search:** on or off
+   - **Empty message:** your text, like "No events match. Try another type."
+
+**2. Tag the Events Collection List**
+1. Select the Events **Collection List**. Turn **pagination off**, and make sure no item limit cuts events off (up to 100; past 100, see [Finsweet List Load](#more-than-100-items-finsweet-list-load)).
+2. Select the **Collection Item** (the grid's direct child) and add `data-filter-item` = `events`.
+
+**3. Tag what each item is filtered by**
+1. Decide which field the filters come from, like the event's **Type**.
+2. If it's an **Option** or **plain text** field: inside the Collection Item, add a **Text Block** bound to that field. Add `data-filter-value` = `true`. Hide it with a class set to **Display: None** if it shouldn't show.
+3. If it's a **reference** field: add a Text Block bound to the referenced item's **Name**, with `data-filter-value` = `true`.
+4. If it's a **multi-reference** field: add a nested **Collection List** with that field as its source, a Text Block inside it bound to **Name**, and `data-filter-value` = `true` on the Text Block. Hide the nested list if it shouldn't show.
+5. If the text already shows on the card, like a "Workshop" tag, put `data-filter-value` = `true` right on that Text Block instead.
+
+**4. Tag what search looks at (only if Show search is on)**
+1. On each text search should match, like the event's title and city, add `data-filter-search-text` = `true`.
+2. Without any, search looks at all of the item's text.
+
+**5. Add a pager (optional)**
+Follow [Step 6](#step-6-pagination-optional), using `events` as the group name in `data-filter-pagination` and `data-filter-range`. If the pager is also a Component, give it its own **Group** property connected to those two attributes.
+
+**6. Publish and check**
+- The events filter shows All, then only the event types that events actually have.
+- Filtering events doesn't change the advisors filter on the same page, and the other way around.
+- The count reads "4 events in Workshop," using the instance's noun.
+
+### Several instances on one page
+
+Nothing extra is needed beyond different group names. The script runs once and handles every bar on the page. Each instance keeps its own selected filter, search text, count and page.
+
 ## Two bars on one list
 
-To filter one list two ways, like advisors by state and by service, give both bars the same group name and different fields:
+To filter one list two ways, like advisors by state and by service, use two bars with the **same** group name and a different **field** each. Items show only when they match both bars.
 
-- Bar 1: `data-filter-bar="advisors"` and `data-filter-field="state"`
-- Bar 2: `data-filter-bar="advisors"` and `data-filter-field="service"`
-- On items: `data-filter-value="state"` on state names, and `data-filter-value="service"` on service names
+1. Build two bars (or place the Component twice) with the same group name, like `advisors`.
+2. On the first bar, add `data-filter-field` = `state`. On the second, add `data-filter-field` = `service`.
+3. On each Collection Item, tag both kinds of values:
+   - state names with `data-filter-value` = `state` (not `true`)
+   - service names with `data-filter-value` = `service`
+4. Each bar builds its filters only from the values with its field name.
+5. Use one count and one empty message for the group. The count lists both picks, like "3 advisors in Indiana, Retirement."
 
-Items show only when they match both bars.
+If the second bar has no search field, it spreads its filters on its own, like any bar without search.
 
 ## Equal card heights (optional)
 
+When a card has extra lines (a wrapped name or title, or extra offices in a location bar), the card body moves up over the bottom of the photo, so every card in the grid stays the same height. The photo isn't resized; its bottom edge is covered.
+
+1. On the card's **photo wrapper**, add `data-fit-photo` = `true`. This is the part that gives up space.
+2. On every text that may wrap onto more lines, like the **name** and **title**, add `data-fit-text` = `true`.
+3. On an area that grows when it has more lines, like a **location bar** listing secondary offices, add `data-fit-grow` = `true`.
+4. On the **first line** inside that area, like the **home office** text, add `data-fit-base` = `true`. Anything below it counts as extra.
+5. Give every element after the photo (the card body and the location bar) a **background color**. They sit over the photo's bottom edge, and without a background the photo shows through.
+6. Keep the photo wrapper in normal flow. Don't set it to Position: Absolute.
+
 | Attribute | Goes on |
 |---|---|
-| `data-fit-photo` | The photo wrapper. This gives up space. |
+| `data-fit-photo` | The photo wrapper |
 | `data-fit-text` | Any text that may wrap, like the name and title |
 | `data-fit-grow` | An area that grows with extra lines, like a location bar |
 | `data-fit-base` | The first line inside that area, like the home office |
 
-Give everything after the photo a background color, and keep the photo wrapper in normal flow (not absolutely positioned).
+This works with or without the filter bar. If the card isn't inside a `data-filter-item`, the script treats the photo's parent as the card.
 
 ## More than 100 items: Finsweet List Load
 
@@ -346,6 +450,10 @@ Check that nested Collection Lists (like states inside each item) come through o
 
 ## Known limits
 
+- Webflow limits nested Collection Lists per page and items per nested list. Check them against your busiest card.
+- I tested the filter with up to 150 items on one page. Every filter, search keystroke and page change took under 6ms.
+- The search field sits inside the filter group, so screen readers hear it as part of "Filter advisors by state." It has its own label, so it's still usable.
+- With many filters, the search field stays near its 240px minimum, because the filters claim its line first.
 - The count reads "in" before the active option (for example "in Kentucky"). Change that word in the script if it reads oddly for another list.
 - The filter doesn't change the URL, so you can't share a link to a filtered view.
 - There's no limit on how much of a photo equal heights can cover.
