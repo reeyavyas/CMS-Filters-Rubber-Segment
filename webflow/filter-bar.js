@@ -43,7 +43,7 @@
     const field = bar.dataset.filterField;
     const valueSel = field ? attr('data-filter-value', field) : '[data-filter-value]';
     const search = bar.querySelector('[data-filter-search]');
-    const box = bar.querySelector('[data-filter-options]');
+    const box = bar.matches('[data-filter-options]') ? bar : bar.querySelector('[data-filter-options]');   // the bar can be its own track
     const duration = num(bar.dataset.filterDuration, 420), squash = num(bar.dataset.filterSquash, 3);
 
     const query = () => (search ? search.value.trim() : '');

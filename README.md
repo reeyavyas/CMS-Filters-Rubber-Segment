@@ -33,11 +33,11 @@ This is the finished structure in the **Navigator** panel. Indents show what sit
 ```
 Filter (Component)                  filter-wrapper
 ├─ Bar                              filter-bar       data-filter-bar = advisors
-│  └─ Options track                 filter-options   data-filter-options = true
-│     ├─ Search Form Block          filter-search
-│     │  └─ Input                   filter-input     data-filter-search = true
-│     ├─ "All" option (Button)      filter-option    data-filter-option = true
-│     └─ Thumb (empty Div Block)    filter-thumb     data-filter-thumb = true
+│                                                    data-filter-options = true
+│  ├─ Search Form Block             filter-search
+│  │  └─ Input                      filter-input     data-filter-search = true
+│  ├─ "All" option (Button)         filter-option    data-filter-option = true
+│  └─ Thumb (empty Div Block)       filter-thumb     data-filter-thumb = true
 ├─ Count text                       filter-status    data-filter-status = advisors
 ├─ Empty message                    filter-empty     data-filter-empty = advisors
 └─ Code Embed (the script)          hidden           (display: none)
@@ -94,43 +94,31 @@ Build each element at the **Desktop** breakpoint first (the base, with the deskt
 
 #### 2a. The bar
 
-This is the outer background around everything.
+One element is the bar's background and also the track that holds the search field, the filters and the thumb. It decides how they wrap.
 
 1. Inside `filter-wrapper`, add a **Div Block**. Give it the class `filter-bar`.
 2. Add the attribute `data-filter-bar` = `advisors`.
-3. Optional: add `data-filter-label` = `Filter advisors by state`. Screen readers announce this as the name of the filter group.
-4. Style it:
+3. Add the attribute `data-filter-options` = `true`. This tells the script the filters live directly inside the bar.
+4. Optional: add `data-filter-label` = `Filter advisors by state`. Screen readers announce this as the name of the filter group.
+5. Style it:
 
 | Breakpoint | Style panel settings |
 |---|---|
-| Desktop | **Size:** Width `fit-content`, Min W `700px`, Max W `100%`. **Spacing:** padding 8px on all sides, margin left and right Auto. **Backgrounds:** your bar color. **Borders:** your corner radius. |
+| Desktop | **Layout:** Display Flex, Direction Horizontal, Align Center, Justify Start, **Wrap children** on, row gap `8px`. **Size:** Width `fit-content`, Min W `700px`, Max W `100%`. **Spacing:** padding 11px on all sides, margin left and right Auto. **Backgrounds:** your bar color. **Borders:** your corner radius. |
 | Tablet | **Size:** Min W None |
-| Mobile portrait | **Size:** Width Auto |
+| Mobile portrait | **Layout:** Justify Center. **Size:** Width Auto. |
 
-`fit-content` keeps the bar only as wide as it needs to be, and Auto margins center it. Type `fit-content` straight into the Width field. If your Webflow version won't accept it, leave Width on Auto; the bar then fills its container.
+- **Padding** is the space between the bar's edge and everything inside it, including the thumb. 11px matches the look of the demo (it was 8px on the old outer bar plus 3px on the old track). Use your own spacing value.
+- **Row gap** is the space between lines of filters, and between the search field and the filters on phones.
+- **`fit-content`** keeps the bar only as wide as it needs to be, and Auto margins center it. Type `fit-content` straight into the Width field. If your Webflow version won't accept it, leave Width on Auto; the bar then fills its container.
 
-#### 2b. The options track
+Don't bind the bar to the CMS or add a filter for each state. The script adds one filter for each value you tag on your items in [Step 5](#step-5-connect-your-items).
 
-This holds the search field, the filters and the thumb, and decides how they wrap.
+#### 2b. The search field (optional)
 
-1. Inside the bar, add a **Div Block**. Give it the class `filter-options`.
-2. Add the attribute `data-filter-options` = `true`.
-3. Style it:
+Putting the search field **inside the bar, as its first child**, lets the filters fill the rest of its line. Filters that don't fit wrap to the next line, starting under the search field.
 
-| Breakpoint | Style panel settings |
-|---|---|
-| Desktop | **Layout:** Display Flex, Direction Horizontal, Align Center, Justify Start, **Wrap children** on, row gap `8px`. **Spacing:** padding 3px on all sides. **Borders:** radius matching the bar's. |
-| Mobile portrait | **Layout:** Justify Center |
-
-The 3px padding is the space between the thumb and the track's edge. The 8px row gap is the space between lines of filters.
-
-Don't bind the track to the CMS or add a filter for each state. The script adds one filter for each value you tag on your items in [Step 5](#step-5-connect-your-items).
-
-#### 2c. The search field (optional)
-
-Putting the search field **inside the track, as its first child**, lets the filters fill the rest of its line. Filters that don't fit wrap to the next line, starting under the search field.
-
-1. From the **Add** panel, drag a **Form Block** inside the track, above everything else in it. Give the form the class `filter-search`.
+1. From the **Add** panel, drag a **Form Block** inside the bar, above everything else in it. Give the form the class `filter-search`.
 2. Inside the Form Block, delete the **Submit button**, the **Success message** and the **Error message**. If it has a **Field label**, delete that too.
 3. Select the **Input**. In Element settings, set **Type** to Plain, clear its **Name** if you like, and type a **Placeholder**, like "Search by name or city."
 4. On the Input, add the attribute `data-filter-search` = `true`. Pressing Enter won't submit the form.
@@ -147,11 +135,11 @@ The search field starts at 240px wide. If its line has room left after the filte
 
 Optional: to show a magnifying glass, place your icon inside the Form Block, set it to **Position: Absolute**, about 12px from the left and centered vertically, and give the Input enough left padding (about 40px) so the text clears it.
 
-#### 2d. The "All" option
+#### 2c. The "All" option
 
 This is the only filter you build. It's the template the script copies for every state, so **style it as an inactive filter**.
 
-1. Inside the track, after the search field, add a **Button**. Change its text to **All**.
+1. Inside the bar, after the search field, add a **Button**. Change its text to **All**.
 2. Give it the class `filter-option`.
 3. Add the attribute `data-filter-option` = `true`.
 4. Style it:
@@ -168,21 +156,21 @@ If you use a **Link Block** with a Text Block inside instead of a Button, put `d
 
 **For a bar without a search field:** add a combo class to the "All" option, like `is-spread`, and set its **Flex Child** to Grow `1` on Desktop and back to Don't grow on Mobile portrait. The filters then share the bar's width evenly. Every filter the script makes copies the combo class too.
 
-#### 2e. The thumb
+#### 2d. The thumb
 
 The thumb is the white (or any color) shape that slides behind the active filter.
 
-1. Inside the track, add a **Div Block** as the **last** child, after the "All" option. Leave it empty.
+1. Inside the bar, add a **Div Block** as the **last** child, after the "All" option. Leave it empty.
 2. Give it the class `filter-thumb`.
 3. Add the attribute `data-filter-thumb` = `true`.
 4. Style only three things:
    - **Backgrounds:** the active filter's background color.
    - **Typography:** Color set to **the active filter's text color**. This is the "text color change" (see Step 3).
-   - **Borders:** the active filter's corner radius. 7px fits inside a 10px track with 3px padding.
+   - **Borders:** the active filter's corner radius. The demo uses 7px inside a 10px bar.
 
-Don't set its size, position, padding or display. The script makes it cover the track, places a copy of every filter label inside it, and clips it to the active filter.
+Don't set its size, position, padding or display. The script makes it cover the bar, places a copy of every filter label inside it, and clips it to the active filter.
 
-**In the Designer, the thumb looks empty or invisible.** That's expected. Custom code doesn't run in the Designer, so you'll only see "All" in the track, with no thumb behind it. Everything appears on the published site.
+**In the Designer, the thumb looks empty or invisible.** That's expected. Custom code doesn't run in the Designer, so you'll only see "All" in the bar, with no thumb behind it. Everything appears on the published site.
 
 ### Step 3: Set the inactive and active colors
 
@@ -279,7 +267,7 @@ Add these to the bar element (`filter-bar`) as custom attributes:
 | `data-filter-squash` | How far the thumb overshoots before settling, in px. `0` gives a plain slide. | `3` |
 | `data-filter-field` | A field name, like `state`, for [two bars on one list](#two-bars-on-one-list) | All `data-filter-value` text |
 
-**Focus ring:** keyboard users see an outline around the track when a filter has focus. To change it, select the bar's class, open **Custom properties** in the Style panel, and add `--filter-focus` (a color) and `--filter-focus-offset` (a length, like `-2px`). Without them, it uses the current text color, 2px out.
+**Focus ring:** keyboard users see an outline around the bar when a filter has focus. To change it, select the bar's class, open **Custom properties** in the Style panel, and add `--filter-focus` (a color) and `--filter-focus-offset` (a length, like `-2px`). Without them, it uses the current text color, 2px out.
 
 ### Step 8: Publish and test
 
@@ -349,9 +337,9 @@ Check that nested Collection Lists (like states inside each item) come through o
 | Nothing happens | The script isn't in a Code Embed, the page's Before `</body>` field or Footer code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
 | Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
 | Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 6). |
-| The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
+| The thumb is missing | The bar needs a `data-filter-thumb` element inside it. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
-| Search sits on its own line on a tablet or desktop | The search Form Block is outside the options track, or its Mobile portrait settings were set on a larger breakpoint. Move it inside the track as the first child, and keep the full-width settings on Mobile portrait only. |
+| Search sits on its own line on a tablet or desktop | The search Form Block isn't directly inside the bar, or its Mobile portrait settings were set on a larger breakpoint. Make it the bar's first child, and keep the full-width settings on Mobile portrait only. |
 | An extra gap inside the bar | The Code Embed sits inside the bar. Move it beside the bar. |
 | Empty gaps in the grid | `data-filter-item` is on the card instead of the Collection Item, or items are pinned to grid cells |
 | Enter reloads the page | The Input isn't the one with `data-filter-search` |

@@ -13,11 +13,11 @@
   h2 { font: 700 24px Georgia, serif; margin: 48px 0 16px; }
 
   /* Bar */
-  /* The bar is only as wide as it needs to be (700px minimum on desktop). The search field is the options
-     track's first item, so filters fill the rest of its line and any that don't fit wrap to the next line,
-     starting under the search field. Filters keep their natural width. */
-  .filter-bar { width: fit-content; max-width: 100%; margin: 0 auto; padding: 8px; border-radius: 10px; background: rgba(255,255,255,.12); --filter-focus: #fff; --filter-focus-offset: -2px; }
-  .filter-options { display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; row-gap: 8px; padding: 3px; border-radius: 10px; }
+  /* One element is both the bar and the options track. It's only as wide as it needs to be (700px minimum
+     on desktop). The search field is its first item, so filters fill the rest of that line and any that don't
+     fit wrap to the next line, starting under the search field. Filters keep their natural width.
+     Padding 11px is the old bar (8px) plus track (3px), so the look is unchanged. */
+  .filter-bar { display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; row-gap: 8px; width: fit-content; max-width: 100%; margin: 0 auto; padding: 11px; border-radius: 10px; background: rgba(255,255,255,.12); --filter-focus: #fff; --filter-focus-offset: -2px; }
   /* Search starts at 240px and grows first (grow 1000) up to 400px with any room left on its line */
   .filter-search { position: relative; flex: 1000 0 240px; width: 400px; max-width: 400px; margin: 0 12px 0 0; }
   .filter-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #13232e; pointer-events: none; }
@@ -37,8 +37,7 @@
   }
   /* Webflow Mobile portrait (478px and below): the only size where search gets its own line */
   @media (max-width: 478px) {
-    .filter-bar { width: auto; }
-    .filter-options { justify-content: center; }
+    .filter-bar { width: auto; justify-content: center; }
     .filter-search { flex-basis: 100%; width: auto; max-width: none; margin: 0; }
     .filter-option, .filter-option.is-spread { flex-grow: 0; padding-left: 4px; padding-right: 4px; }
   }
@@ -72,16 +71,14 @@
 <main class="page">
 
   <!-- Example 1: advisors by state, with search and equal card heights. Sample people are made up. -->
-  <div class="filter-bar" data-filter-bar="advisors" data-filter-label="Filter advisors by state">
-    <div class="filter-options" data-filter-options>
-      <form class="filter-search" onsubmit="return false">
-        <label for="advisorSearch" class="hide">Search advisors</label>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-        <input id="advisorSearch" class="filter-input" type="search" placeholder="Search by name or city" data-filter-search>
-      </form>
-      <a href="#" class="filter-option" data-filter-option>All</a>
-      <div class="filter-thumb" data-filter-thumb></div>
-    </div>
+  <div class="filter-bar" data-filter-bar="advisors" data-filter-options data-filter-label="Filter advisors by state">
+    <form class="filter-search" onsubmit="return false">
+      <label for="advisorSearch" class="hide">Search advisors</label>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="advisorSearch" class="filter-input" type="search" placeholder="Search by name or city" data-filter-search>
+    </form>
+    <a href="#" class="filter-option" data-filter-option>All</a>
+    <div class="filter-thumb" data-filter-thumb></div>
   </div>
   <p class="filter-status" data-filter-status="advisors" data-filter-noun="advisor"></p>
   <p class="filter-empty" data-filter-empty="advisors">No advisors match. Try a different name, city or state.</p>
@@ -125,11 +122,9 @@
 
   <!-- Example 2: the same component filtering events by category, in CMS order, with no search -->
   <h2>Events</h2>
-  <div class="filter-bar" data-filter-bar="events" data-filter-sort="cms" data-filter-label="Filter events by type">
-    <div class="filter-options" data-filter-options>
-      <a href="#" class="filter-option is-spread" data-filter-option>All</a>
-      <div class="filter-thumb" data-filter-thumb></div>
-    </div>
+  <div class="filter-bar" data-filter-bar="events" data-filter-sort="cms" data-filter-options data-filter-label="Filter events by type">
+    <a href="#" class="filter-option is-spread" data-filter-option>All</a>
+    <div class="filter-thumb" data-filter-thumb></div>
   </div>
   <p class="filter-status" data-filter-status="events" data-filter-noun="event"></p>
   <div class="grid" role="list">
@@ -141,6 +136,6 @@
 </main>
 
 <!-- In Webflow this goes in Site settings > Custom code > Footer code -->
-<script src="webflow/filter-bar.js?v=row-gap"></script>
+<script src="webflow/filter-bar.js?v=one-element"></script>
 </body>
 </html>
