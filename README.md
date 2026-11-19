@@ -92,7 +92,7 @@ These Style panel settings center the bar, keep it only as wide as it needs to b
 | Breakpoint | Element | Setting |
 |---|---|---|
 | Desktop (base) | Bar | Width: `fit-content`. Max width: 100%. Min width: 700px. Left and right margin: Auto. |
-| Desktop (base) | Options track | Display: Flex, wrap, justify start, align center |
+| Desktop (base) | Options track | Display: Flex, wrap, justify start, align center. Row gap: 8px (the space between lines). |
 | Desktop (base) | Search Form Block | Flex child, Custom: grow `1000`, shrink `0`, basis `240px`. Width and max width: 400px. Right margin: 12px. |
 | Desktop (base) | "All" option | Left and right padding: 48px. Flex child: none, so it keeps its natural width. |
 | Desktop (base) | "All" option on a bar without search | Add a combo class, like `is-spread`, with flex grow `1`, so the options share the bar's width evenly |
@@ -100,7 +100,7 @@ These Style panel settings center the bar, keep it only as wide as it needs to b
 | Tablet | "All" option | Left and right padding: 24px |
 | Mobile portrait | Bar | Width: Auto |
 | Mobile portrait | Options track | Justify center |
-| Mobile portrait | Search Form Block | Flex child basis: 100%. Width: Auto. Max width: None. Right margin: 0. Bottom margin: 8px. |
+| Mobile portrait | Search Form Block | Flex child basis: 100%. Width: Auto. Max width: None. Right margin: 0. (The track's row gap spaces it from the filters.) |
 | Mobile portrait | "All" option (and `is-spread`) | Left and right padding: 4px. Flex grow `0`. |
 
 Tablet settings carry down to Mobile landscape, so search stays on the first line on every iPad and on phones held sideways. Only Mobile portrait (478px and below) puts search on its own line. The search field starts at 240px and grows to 400px when its line has room.

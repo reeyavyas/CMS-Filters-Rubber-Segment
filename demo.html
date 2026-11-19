@@ -17,7 +17,7 @@
      track's first item, so filters fill the rest of its line and any that don't fit wrap to the next line,
      starting under the search field. Filters keep their natural width. */
   .filter-bar { width: fit-content; max-width: 100%; margin: 0 auto; padding: 8px; border-radius: 10px; background: rgba(255,255,255,.12); --filter-focus: #fff; --filter-focus-offset: -2px; }
-  .filter-options { display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; padding: 3px; border-radius: 10px; }
+  .filter-options { display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; row-gap: 8px; padding: 3px; border-radius: 10px; }
   /* Search starts at 240px and grows first (grow 1000) up to 400px with any room left on its line */
   .filter-search { position: relative; flex: 1000 0 240px; width: 400px; max-width: 400px; margin: 0 12px 0 0; }
   .filter-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #13232e; pointer-events: none; }
@@ -39,7 +39,7 @@
   @media (max-width: 478px) {
     .filter-bar { width: auto; }
     .filter-options { justify-content: center; }
-    .filter-search { flex-basis: 100%; width: auto; max-width: none; margin: 0 0 8px; }
+    .filter-search { flex-basis: 100%; width: auto; max-width: none; margin: 0; }
     .filter-option, .filter-option.is-spread { flex-grow: 0; padding-left: 4px; padding-right: 4px; }
   }
 
@@ -141,6 +141,6 @@
 </main>
 
 <!-- In Webflow this goes in Site settings > Custom code > Footer code -->
-<script src="webflow/filter-bar.js?v=under-search"></script>
+<script src="webflow/filter-bar.js?v=row-gap"></script>
 </body>
 </html>
