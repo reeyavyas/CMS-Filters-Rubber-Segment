@@ -10,9 +10,11 @@
 [data-filter-item][hidden],[data-filter-empty][hidden],[data-filter-pagination][hidden]{display:none!important}
 [data-filter-prev],[data-filter-next],[data-filter-page]{cursor:pointer}
 [data-filter-options]{position:relative;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+[data-filter-options] input,[data-filter-options] textarea{-webkit-user-select:text;user-select:text}
 [data-filter-option]{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}
-[data-filter-options]:has(:focus-visible){outline:2px solid var(--filter-focus,currentColor);outline-offset:var(--filter-focus-offset,2px)}
-[data-filter-thumb]{position:absolute!important;inset:0!important;margin:0!important;box-sizing:border-box;pointer-events:none}
+[data-filter-options]:has([data-filter-option]:focus-visible){outline:2px solid var(--filter-focus,currentColor);outline-offset:var(--filter-focus-offset,2px)}
+[data-filter-thumb]{position:absolute!important;inset:0!important;margin:0!important;padding:0!important;border:0!important;box-sizing:border-box;pointer-events:none}
+[data-filter-thumb]>*{position:absolute!important;margin:0!important;box-sizing:border-box!important}
 [data-filter-thumb] *{color:inherit!important;background:none!important;border-color:transparent!important;box-shadow:none!important}
 [data-fit-photo]{margin-bottom:calc(-1*var(--fit-extra,0px))}
 [data-fit-photo]~*{position:relative}`;
@@ -80,11 +82,8 @@
       return el;
     };
 
-    // The thumb copies the options' layout, then holds a copy of every label, clipped to the active one
-    const LAYOUT = ['display', 'flexDirection', 'flexWrap', 'justifyContent', 'alignItems', 'alignContent', 'rowGap', 'columnGap',
-      'gridAutoFlow', 'gridAutoColumns', 'gridTemplateColumns', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'];
-    const mirror = () => { const cs = getComputedStyle(box); LAYOUT.forEach(p => { thumb.style[p] = cs[p]; }); };
-
+    // The thumb holds a copy of every label, each placed exactly over its real option, clipped to the
+    // active one. Placing by position (not by copying layout) lets the track hold other things, like the search field.
     // Rects are sub-pixel and carry top and bottom, because options can wrap onto more than one line
     const origin = () => thumb.getBoundingClientRect();
     const rect = i => {
@@ -104,7 +103,14 @@
       const o = origin();
       return [l, o.width - r, t, o.height - b];
     };
-    const place = () => { anim?.cancel(); mirror(); thumb.style.clipPath = clip(rect(active)); };
+    const place = () => {
+      anim?.cancel();
+      [...thumb.children].forEach((c, i) => {
+        const [l, r, t, b] = rect(i);
+        Object.assign(c.style, { left: `${l}px`, top: `${t}px`, width: `${r - l}px`, height: `${b - t}px` });
+      });
+      thumb.style.clipPath = clip(rect(active));
+    };
 
     function animateTo(frames) {
       anim?.cancel();
@@ -163,6 +169,7 @@
         ['id', 'role', 'tabindex', 'aria-checked', 'aria-label', 'data-filter-option'].forEach(a => c.removeAttribute(a));
         return c;
       }));
+      slots.forEach(s => placeRO.observe(s));
       place();
     }
 
@@ -224,7 +231,8 @@
     };
     box.addEventListener('pointerup', endDrag);
     box.addEventListener('pointercancel', endDrag);
-    new ResizeObserver(place).observe(box);
+    const placeRO = new ResizeObserver(place);   // options can move when the track, or anything beside them, changes size
+    placeRO.observe(box);
 
     return {
       matches: item => (!value() || q(valueSel, item).some(v => v.textContent.trim() === value())) && api.matches(item),

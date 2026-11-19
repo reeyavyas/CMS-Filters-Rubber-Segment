@@ -57,50 +57,50 @@ Use the Before `</body>` field, not the head field. On a CMS template page, the 
 Pick a **group name** first, for example `advisors`. It ties a bar to its items, count and empty message, so two bars on one page never interfere.
 
 **The bar**
-1. Add a **Div Block** and give it your class.
+1. Add a **Div Block** and give it your class. This is the outer background.
 2. Add `data-filter-bar` = `advisors`.
 3. Optional: add `data-filter-label` = `Filter advisors by state`. This is what screen readers announce.
 
-**The search field (optional)**
-1. Inside the bar, add a **Form Block**.
-2. Delete the submit button and the success and error messages.
-3. Style the **Input** with your class.
-4. On the Input, add `data-filter-search` = `true`. Pressing Enter won't submit the form.
-
 **The options track**
 1. Inside the bar, add a **Div Block** for the track.
-2. Style it with your class. Its **padding** is the space between the thumb and the track's edge, and its flex and wrap settings decide how the options lay out.
+2. Style it with your class. Its **padding** is the space between the thumb and the track's edge, and its flex and wrap settings decide how everything inside lays out.
 3. Add `data-filter-options` = `true`.
 
 Don't bind the track to the CMS. The script adds one option for each value you tag in [Step 4](#step-4-connect-your-items).
 
+**The search field (optional)**
+1. Inside the track, as its **first** child, add a **Form Block**. Putting search inside the track lets the filters fill the rest of its line, and only the ones that don't fit wrap to the next line.
+2. Delete the submit button and the success and error messages.
+3. Style the **Input** with your class.
+4. On the Input, add `data-filter-search` = `true`. Pressing Enter won't submit the form.
+
 **The "All" option**
-1. Inside the track, add a **Button** (or a Link Block or Div) and type **All**.
+1. Inside the track, after the search field, add a **Button** (or a Link Block or Div) and type **All**.
 2. Style it as an **inactive** option: padding, font, idle text color and breakpoints. Every other option is copied from it.
 3. Add `data-filter-option` = `true`.
 4. If the label sits in a Text Block inside a Link Block, add `data-filter-option-label` = `true` to the Text Block.
 
 **The thumb**
 1. Inside the track, add an empty **Div Block**.
-2. Style only its **background color**, **text color** (the active label color) and **corner radius**. The script handles its size, position and layout.
+2. Style only its **background color**, **text color** (the active label color) and **corner radius**. The script handles its size, position and labels.
 3. Add `data-filter-thumb` = `true`.
 
 **Recommended layout**
 
-These Style panel settings center the bar, keep it only as wide as it needs to be, and spread the options evenly when there's room. They're what `demo.html` uses.
+These Style panel settings center the bar, keep it only as wide as it needs to be, keep search on the same line as the first filters, and spread the options evenly when there's room. They're what `demo.html` uses.
 
 | Element | Setting |
 |---|---|
-| Bar | Display: Flex, wrap, justify center. Width: `fit-content`. Max width: 100%. Left and right margin: Auto. |
+| Bar | Width: `fit-content`. Max width: 100%. Left and right margin: Auto. |
 | Bar, desktop only (wider than 1024px) | Min width: 700px |
 | Bar, below 720px | Width: Auto |
-| Search wrapper | Flex child, Custom: grow `1000`, shrink `1`, basis `240px`. Width and max width: 400px. |
-| Options track | Flex child, Custom: grow `1`, shrink `1`, basis Auto |
+| Options track | Display: Flex, wrap, justify center, align center |
+| Search Form Block | Flex child, Custom: grow `1000`, shrink `0`, basis `240px`. Width and max width: 400px. Right margin: 12px. |
 | "All" option | Flex child, Custom: grow `1` |
-| Options track, below 720px | Justify center |
+| Search Form Block, below 720px | Flex child basis: 100%. Width: Auto. Max width: None. Right margin: 0. Bottom margin: 8px. |
 | "All" option, below 720px | Flex child, Custom: grow `0` |
 
-The high grow on the search wrapper lets it take spare space first, up to its 400px cap. The track takes whatever is left, and the options share it equally. Without a search field, the options spread across the bar's 700px minimum on desktop. Below 720px, the bar stays full width and each line of options keeps its natural width, centered, so a short last line stays short.
+The search field starts at 240px, so filters fill the rest of the first line. Its high grow then lets it take spare space first, up to 400px, and the filters share what's left. Without a search field, the options spread across the bar's 700px minimum on desktop. Below 720px, search sits on its own line on top, and each line of options keeps its natural width, centered.
 
 ### Step 3: Count and empty message (optional)
 
@@ -226,6 +226,7 @@ Check that nested Collection Lists (like states inside each item) come through o
 | Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 5). |
 | The thumb is missing | The track needs a `data-filter-thumb` element. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
+| Search sits on its own line on desktop | The search Form Block is outside the options track. Move it inside, as the track's first child. |
 | An extra gap inside the bar | The Code Embed sits inside the bar. Move it beside the bar. |
 | Empty gaps in the grid | `data-filter-item` is on the card instead of the Collection Item, or items are pinned to grid cells |
 | Enter reloads the page | The Input isn't the one with `data-filter-search` |
