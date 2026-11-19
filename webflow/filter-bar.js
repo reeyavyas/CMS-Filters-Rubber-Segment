@@ -66,6 +66,7 @@
     thumb.setAttribute('aria-hidden', 'true');
     template.dataset.filterOptionValue = '';
     let slots = [template], active = 0, anim = null, drag = null, suppressClick = false;
+    const fullName = new Map();   // value text -> full name from data-filter-name
     const value = () => slots[active].dataset.filterOptionValue;
 
     const make = name => {
@@ -137,19 +138,26 @@
 
     // Options come from the items' [data-filter-value] text: A to Z, or CMS order with data-filter-sort="cms".
     // Runs again whenever items are added, so new values get an option and vanished ones lose theirs.
+    // A value's data-filter-name (like "Indiana" for "IN") becomes the option's screen reader name and the count's wording.
     function sync() {
-      const names = [...new Set(q(`${attr('data-filter-item', group)} ${valueSel}`).map(e => e.textContent.trim()).filter(Boolean))];
+      const els = q(`${attr('data-filter-item', group)} ${valueSel}`);
+      els.forEach(e => { const full = e.dataset.filterName?.trim(); if (full) fullName.set(e.textContent.trim(), full); });
+      const names = [...new Set(els.map(e => e.textContent.trim()).filter(Boolean))];
       if (bar.dataset.filterSort !== 'cms') names.sort((a, b) => a.localeCompare(b));
       const keep = value(), byValue = new Map(slots.map(s => [s.dataset.filterOptionValue, s]));
       const next = [template, ...names.map(n => byValue.get(n) || make(n))];
       slots.filter(s => !next.includes(s)).forEach(s => s.remove());
-      next.forEach(s => box.insertBefore(s, thumb));
+      next.forEach(s => {
+        const full = fullName.get(s.dataset.filterOptionValue);
+        if (full) s.setAttribute('aria-label', full);
+        box.insertBefore(s, thumb);
+      });
       slots = next;
       active = Math.max(0, slots.findIndex(s => s.dataset.filterOptionValue === keep));
       mark();
       thumb.replaceChildren(...slots.map(s => {
         const c = s.cloneNode(true);
-        ['id', 'role', 'tabindex', 'aria-checked', 'data-filter-option'].forEach(a => c.removeAttribute(a));
+        ['id', 'role', 'tabindex', 'aria-checked', 'aria-label', 'data-filter-option'].forEach(a => c.removeAttribute(a));
         return c;
       }));
       place();
@@ -217,7 +225,7 @@
 
     return {
       matches: item => (!value() || q(valueSel, item).some(v => v.textContent.trim() === value())) && api.matches(item),
-      label: value, query, sync
+      label: () => fullName.get(value()) || value(), query, sync
     };
   }
 

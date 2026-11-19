@@ -9,7 +9,7 @@ You design every part in the Webflow Designer with your own classes. One script 
 | File | What it is |
 |---|---|
 | `webflow/filter-bar.js` | The whole component. Paste it into Webflow, wrapped in a script tag. |
-| `demo.html` | Two working bars with made-up sample data: 100 advisors by state at 12 per page, and events by type. Its `<style>` block stands in for the classes you build in Webflow. |
+| `demo.html` | Two working bars with made-up sample data: 100 advisors across 8 states (shown as two-letter codes) at 12 per page, and events by type. Its `<style>` block stands in for the classes you build in Webflow. |
 
 ## How it behaves
 
@@ -110,6 +110,7 @@ Your Collection List, grid and cards stay yours. Add these:
 | `data-filter-item` = `advisors` | Each **Collection Item** (the grid's direct child, not the card inside it) |
 | `data-filter-value` = `true` | Each value the item belongs to, like a state or category. For a multi-reference field, use a nested Collection List with a Text bound to Name. For an Option or text field, bind one Text. Hide them with display: none if they shouldn't show. |
 | `data-filter-search-text` = `true` (optional) | Each text search should look at. Without it, search looks at all of the item's text. |
+| `data-filter-name` (optional) | The same Text as `data-filter-value`, when it shows a short label like "IN." Bind the attribute's value to the CMS field with the full name, like "Indiana." Screen readers announce the full name, and the count reads "13 advisors in Indiana." |
 
 Let the grid place items automatically. If you pin items to specific cells, hidden items leave holes.
 
