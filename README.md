@@ -141,6 +141,8 @@ Optional: to show a magnifying glass, place your icon inside the Form Block, set
 This is the only filter you build. It's the template the script copies for every state, so **style it as an inactive filter**.
 
 1. Inside the bar, after the search field, add a **Button**. Change its text to **All**.
+
+   Use the **Button** element from the **Add** panel (in the Basic section), which is a link. **Don't use a form's Submit button**, and don't put the "All" option inside the search Form Block. A submit button belongs to a form and would try to send it.
 2. Give it the class `filter-option`.
 3. Add the attribute `data-filter-option` = `true`.
 4. Style it:
@@ -245,7 +247,7 @@ The bar filters every item first, then shows one page of the matches. A filter o
 
 1. Below your grid, add a **Div Block** for the pager. Give it the class `pager`, and lay it out as you like, for example Display Flex, centered, 8px gap.
 2. Add `data-filter-pagination` = `advisors` and `data-filter-page-size` = `12`.
-3. Inside the pager, add a **Button** with the text "Previous" and the class `pager-step`. Add `data-filter-prev` = `true`.
+3. Inside the pager, add a **Button** with the text "Previous" (the **Button** element from the Add panel's Basic section, not a form's Submit button) and the class `pager-step`. Add `data-filter-prev` = `true`.
 4. After it, add a **Div Block** with the class `pager-pages` for the page numbers. Add `data-filter-pages` = `true`.
 5. Inside `pager-pages`, add one **Button** with the text **1** and the class `pager-page`. Add `data-filter-page` = `true`. Every page number is copied from it. If you use a Link Block with a Text Block inside instead, put `data-filter-page-label` = `true` on the Text Block, so the script knows where to write each number.
 6. Optional: inside `pager-pages`, after the page button, add a **Text Block** with "…" and `data-filter-page-gap` = `true`. With more than 7 pages, the pager then shows the first page, the last page and the pages next to the current one, with "…" between them. Without it, every page number shows.
