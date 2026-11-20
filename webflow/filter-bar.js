@@ -247,13 +247,18 @@
 
   // Card motion: when a filter or page changes, every visible card answers, in grid order, 40ms apart:
   // - cards that appear scale up with a small bounce (94% to 102% to 100%) while fading in
-  // - cards that stay but move glide from their old spot, with a matching small overshoot
+  // - cards that stay but move glide to their new spot (stopping exactly on it), then bounce the same way
   // - cards that stay in the same spot bounce in place (100% to 102% to 100%), without fading
+  // On phones (767px and below, Webflow's Mobile landscape and Mobile portrait) cards are full width and tall,
+  // so the bounce is smaller (97% to 100.8%) and grows from the card's top edge, which never moves up into the bar.
   // data-filter-card-motion="off" on the bar turns it off. Only transform and opacity move, and reduced
   // motion turns it off too.
-  const POP_MS = 520, STAGGER_MS = 40, GLIDE_EASE = 'cubic-bezier(.34,1.3,.64,1)';
+  const POP_MS = 520, STAGGER_MS = 40;
   const UP = 'cubic-bezier(.2,.8,.2,1)', SETTLE = 'cubic-bezier(.4,0,.2,1)';
+  const phone = matchMedia('(max-width: 767px)');
   function animateCards(items, before) {
+    const s = phone.matches ? { from: 0.97, peak: 1.008, origin: '50% 0' } : { from: 0.94, peak: 1.02, origin: '50% 50%' };
+    const frame = (scale, extra) => ({ transform: `scale(${scale})`, transformOrigin: s.origin, ...extra });
     let n = 0;
     items.forEach(item => {
       if (item.hidden) return;
@@ -261,20 +266,25 @@
       const delay = Math.min(n++, 12) * STAGGER_MS;   // stops growing after 12 cards, so a long list doesn't drag
       if (!was) {
         item.animate([
-          { opacity: 0, transform: 'scale(.94)', easing: UP },
-          { opacity: 1, transform: 'scale(1.02)', offset: 0.6, easing: SETTLE },
-          { opacity: 1, transform: 'scale(1)' },
+          frame(s.from, { opacity: 0, easing: UP }),
+          frame(s.peak, { opacity: 1, offset: 0.6, easing: SETTLE }),
+          frame(1, { opacity: 1 }),
         ], { duration: POP_MS, delay, fill: 'backwards' });
         return;
       }
       const dx = was.left - now.left, dy = was.top - now.top;
       if (Math.abs(dx) + Math.abs(dy) >= 1) {
-        item.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: POP_MS, easing: GLIDE_EASE });
+        // Glide without overshooting the spot (a long glide's overshoot ran into the bar on phones), then the same small bounce
+        item.animate([
+          { transform: `translate(${dx}px, ${dy}px) scale(1)`, transformOrigin: s.origin, easing: UP },
+          { transform: `translate(0px, 0px) scale(${s.peak})`, transformOrigin: s.origin, offset: 0.6, easing: SETTLE },
+          { transform: 'translate(0px, 0px) scale(1)', transformOrigin: s.origin },
+        ], { duration: POP_MS });
       } else {
         item.animate([
-          { transform: 'scale(1)', easing: UP },
-          { transform: 'scale(1.02)', offset: 0.6, easing: SETTLE },
-          { transform: 'scale(1)' },
+          frame(1, { easing: UP }),
+          frame(s.peak, { offset: 0.6, easing: SETTLE }),
+          frame(1),
         ], { duration: POP_MS, delay });
       }
     });
