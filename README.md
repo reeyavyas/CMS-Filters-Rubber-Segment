@@ -18,6 +18,7 @@ You design every part in the Webflow Designer with your own classes. One script 
 - **Options build themselves** from the values on your items, A to Z by default. "All" always comes first. When an item with a new value appears, its option appears too.
 - **The thumb** stretches from the old option to the new one, then squashes into place. You can drag or flick it. With reduced motion turned on, it jumps with no animation.
 - **Search** matches as you type, and works together with the options.
+- **Card motion:** when someone picks a filter or changes pages, new cards scale up with a small bounce and fade in one after another, and cards that stay glide to their new spot. Typing in search stays instant.
 - **Pagination (optional):** filters every item first, then shows a page of matches, like 12 at a time, with Previous, Next and page numbers you design.
 - **Keyboard:** Tab reaches the options, and the arrow keys, Home and End move between them.
 - **Wrapping:** if the options wrap onto more lines, the thumb stretches between lines.
@@ -290,8 +291,21 @@ Add these to the bar element (`filter-bar`) as custom attributes:
 | `data-filter-sort` = `cms` | Keeps the order values first appear in your list | A to Z |
 | `data-filter-duration` | How long the thumb's move takes, in milliseconds. `0` turns the animation off. | `420` |
 | `data-filter-squash` | How far the thumb overshoots before settling, in px. `0` gives a plain slide. | `3` |
+| `data-filter-card-motion` = `off` | Turns off the cards' scale-up and glide for this bar | On |
 | `data-filter-field` | A field name, like `state`, for [two bars on one list](#two-bars-on-one-list) | All `data-filter-value` text |
 | `data-filter-spread-class` | The class added to the filters when the bar has no search field | `is-spread` |
+
+#### Card motion
+
+The cards animate on their own when someone picks a filter or changes pages. You don't build anything for it, and you shouldn't add Webflow Interactions to the cards, because they would fight with it.
+
+- **Cards that appear** scale up from 94% to 102%, then settle at 100%, while fading in. Each starts 40ms after the one before. The whole move takes about half a second.
+- **Cards that stay** (they match both the old and the new filter) glide from their old spot to their new one, with the same small overshoot.
+- **Typing in search doesn't animate,** so results keep up with each keystroke.
+- **Reduced motion turns it off.** With Reduce Motion on in someone's device settings, cards simply appear.
+- **To turn it off for one bar,** add `data-filter-card-motion` = `off` to the bar.
+
+The script animates the **Collection Item** (the element with `data-filter-item`), so a hover effect on your card inside it still works. If your Collection Items already use a transform for their own look, the animation briefly overrides it while it plays.
 
 **Focus ring:** keyboard users see an outline around the bar when a filter has focus. To change it, select the bar's class, open **Custom properties** in the Style panel, and add `--filter-focus` (a color) and `--filter-focus-offset` (a length, like `-2px`). Without them, it uses the current text color, 2px out.
 
@@ -307,7 +321,8 @@ Custom code doesn't run in the Designer or Preview mode. Publish to your **webfl
 - [ ] Tab reaches the filters, and the arrow keys, Home and End move between them.
 - [ ] Previous, Next and the page numbers change pages, and a new filter goes back to page 1.
 - [ ] Each page shows no more than your page size, and the pager hides when everything fits on one page.
-- [ ] With Reduce Motion turned on in your device settings, the thumb jumps with no animation.
+- [ ] Picking a filter makes new cards scale up with a small bounce, one after another, and cards that stay glide into place.
+- [ ] With Reduce Motion turned on in your device settings, the thumb jumps and the cards appear with no animation.
 - [ ] On desktop and every iPad width, search shares its line with the first filters. On a phone held upright, search sits on top.
 - [ ] Nothing scrolls sideways at 320px.
 

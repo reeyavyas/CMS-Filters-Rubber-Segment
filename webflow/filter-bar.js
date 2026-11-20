@@ -58,7 +58,7 @@
       search.addEventListener('keydown', e => { if (e.key === 'Enter') e.preventDefault(); });   // never submits a Webflow form
     }
 
-    const api = { matches: item => !query() || searchText(item).includes(query().toLowerCase()), label: () => '', query, sync() {} };
+    const api = { el: bar, matches: item => !query() || searchText(item).includes(query().toLowerCase()), label: () => '', query, sync() {} };
     if (!box) return api;   // search-only bar
     const template = box.querySelector('[data-filter-option]');
     const thumb = box.querySelector('[data-filter-thumb]');
@@ -146,7 +146,7 @@
       } else {
         animateTo([from, to]);
       }
-      applyGroup(group);
+      applyGroup(group, false, true);
     }
 
     // Options come from the items' [data-filter-value] text: A to Z, or CMS order with data-filter-sort="cms".
@@ -239,17 +239,50 @@
     placeRO.observe(box);
 
     return {
+      el: bar,
       matches: item => (!value() || q(valueSel, item).some(v => v.textContent.trim() === value())) && api.matches(item),
       label: () => fullName.get(value()) || value(), query, sync
     };
   }
 
+  // Card motion: when a filter or page changes, cards that appear scale up with a small bounce (94% to 102%
+  // to 100%) while fading in, one after another, and cards that stay glide to their new spot with a matching
+  // small overshoot. data-filter-card-motion="off" on the bar turns it off. Only transform and opacity move,
+  // and reduced motion turns it off too.
+  const POP_MS = 520, STAGGER_MS = 40, GLIDE_EASE = 'cubic-bezier(.34,1.3,.64,1)';
+  function animateCards(items, before) {
+    let n = 0;
+    items.forEach(item => {
+      if (item.hidden) return;
+      const now = item.getBoundingClientRect(), was = before.get(item);
+      if (was) {
+        const dx = was.left - now.left, dy = was.top - now.top;
+        if (Math.abs(dx) + Math.abs(dy) < 1) return;
+        item.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: POP_MS, easing: GLIDE_EASE });
+      } else {
+        // the stagger stops growing after 12 cards, so a long list doesn't take seconds to finish
+        item.animate([
+          { opacity: 0, transform: 'scale(.94)', easing: 'cubic-bezier(.2,.8,.2,1)' },
+          { opacity: 1, transform: 'scale(1.02)', offset: 0.6, easing: 'cubic-bezier(.4,0,.2,1)' },
+          { opacity: 1, transform: 'scale(1)' },
+        ], { duration: POP_MS, delay: Math.min(n++, 12) * STAGGER_MS, fill: 'backwards' });
+      }
+    });
+  }
+
   // Filters every item in the group first, then shows one page of the matches (all of them without a
   // pager). A filter or search change goes back to page 1; keepPage stays on the current page.
+  // animate is true for filter and page changes, so typing in search stays instant.
   const pageOf = new Map();   // group name -> current page, from 1
-  function applyGroup(group, keepPage = false) {
+  function applyGroup(group, keepPage = false, animate = false) {
     const bars = groups.get(group) || [];
     const items = q(attr('data-filter-item', group));
+    const motion = animate && !reduceMotion.matches && bars[0]?.el.dataset.filterCardMotion !== 'off';
+    const before = new Map();   // where each visible card sat before the change
+    if (motion) items.forEach(item => {
+      item.getAnimations().forEach(a => a.cancel());   // a quick second click starts from where cards really are
+      if (!item.hidden) before.set(item, item.getBoundingClientRect());
+    });
     const matched = items.filter(item => bars.every(b => b.matches(item)));
     const pagers = q(attr('data-filter-pagination', group)).filter(p => p.filterPager);
     const size = num(pagers[0]?.dataset.filterPageSize, 0) || matched.length || 1;
@@ -270,6 +303,7 @@
     q(attr('data-filter-empty', group)).forEach(el => { el.hidden = shown > 0; });
     pagers.forEach(p => renderPager(p, page, count));
     q('[data-fit-photo]').forEach(fit);   // cards just shown get their height now, not on the next frame
+    if (motion) animateCards(items, before);
   }
 
   // Pagination (optional): [data-filter-pagination="group"] with data-filter-page-size. Inside it, any of:
@@ -292,7 +326,7 @@
       if (t.getAttribute('aria-disabled') === 'true') return;
       const p = pageOf.get(group) || 1;
       pageOf.set(group, t.matches('[data-filter-prev]') ? p - 1 : t.matches('[data-filter-next]') ? p + 1 : +t.dataset.filterPageNumber);
-      applyGroup(group, true);
+      applyGroup(group, true, true);
       if (t.matches('[data-filter-page]')) pager.querySelector('[aria-current="page"]')?.focus();   // the old button was replaced
       // Bring the top of the list back into view when it has scrolled away
       const top = document.querySelector(attr('data-filter-bar', group)) || q(attr('data-filter-item', group)).find(i => !i.hidden);
