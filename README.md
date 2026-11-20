@@ -23,6 +23,7 @@ You design every part in the Webflow Designer with your own classes. One script 
 - **Wrapping:** if the options wrap onto more lines, the thumb stretches between lines.
 - **Late-loading items:** items added after the page loads (by Finsweet List Load, for example) are picked up and filtered automatically.
 - **Equal card heights (optional):** extra wrapped lines come out of the card's photo instead of making the card taller.
+- **Repeated values hidden (optional):** a list can show a repeated city, like two branches in Bowling Green, only once.
 
 ## Build a bar
 
@@ -236,6 +237,19 @@ Webflow limits how many nested Collection Lists a page can have, and how many it
 **What search looks at (optional)**
 1. On each text search should match, like the name, title, home office and secondary office cities, add `data-filter-search-text` = `true`.
 2. Without any of these, search looks at all of the item's text.
+
+**Hide repeated cities (optional)**
+When an advisor works at two branches in the same city, a Secondary offices list bound to the city shows it twice, like "Bowling Green, KY" and "Bowling Green, KY." The script can show it once, while your CMS keeps both branches.
+1. Inside the Collection Item, select the nested **Collection List** for Secondary offices (the element that holds the Collection Items, or its wrapper).
+2. Add `data-filter-unique` = `true`.
+3. Publish. In each card's list, any item whose text matches an earlier one is hidden. Capitals and extra spaces don't count as differences, so "Bowling Green, KY" and "bowling green, ky" are the same.
+
+- Different cities all stay visible. Only exact repeats are hidden.
+- The CMS and your profile pages are unchanged. Both branches stay linked, so a profile page can still list each branch's address.
+- Hidden repeats don't count toward equal card heights, so the card doesn't get taller for them.
+- Search still finds the advisor by that city.
+- It works on any list, not just offices. On a list that isn't a Collection List, the element's direct children are compared instead.
+- With this on, you don't need a separate single-reference field (like Secondary location) just to avoid the repeat.
 
 **Short labels (optional, for later)**
 If you switch to short labels like "IN," add `data-filter-name` to the same Text Block as `data-filter-value`, and bind the attribute's value to the CMS field with the full name, like "Indiana." Screen readers then announce "Indiana," and the count reads "13 advisors in Indiana." Skip this while your values are full names.

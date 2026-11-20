@@ -99,6 +99,7 @@
   <script>
     // Demo only: stands in for a Webflow Collection List of 100 made-up advisors across 8 states.
     // Every 4th advisor also works in a second state, so state counts differ and some cards wrap.
+    // Every 8th has two branches in that second city; data-filter-unique shows the city once.
     (() => {
       const first = ['Dana', 'Marcus', 'Priya', 'Tom', 'Elena', 'Grant', 'Keisha', 'Owen', 'Rosa', 'Felix'];
       const last = ['Whitfield', 'Oyelaran', 'Raman', 'Hollister', 'Vasquez', 'Pemberton', 'Monroe', 'Calder', 'Ibarra', 'Lindqvist'];
@@ -112,7 +113,7 @@
         html.push(`<div role="listitem" data-filter-item="advisors"><div class="card">
           <div class="card-photo" data-fit-photo>${name.split(' ').map(w => w[0]).join('')}</div>
           <div class="card-body"><h3 class="card-name" data-filter-search-text data-fit-text>${name}</h3><p class="card-title" data-filter-search-text data-fit-text>${title}</p></div>
-          <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>${city}</div>${also ? `<div data-filter-search-text>Also ${alsoCity}</div>` : ''}</div>
+          <div class="card-bar" data-fit-grow><div data-filter-search-text data-fit-base>${city}</div>${also ? `<div class="w-dyn-list"><div role="list" class="w-dyn-items" data-filter-unique>${(i % 8 === 0 ? [1, 2] : [1]).map(() => `<div role="listitem" class="w-dyn-item"><div data-filter-search-text>Also ${alsoCity}</div></div>`).join('')}</div></div>` : ''}</div>
           <div class="hide"><span data-filter-value>${state}</span>${also && alsoState !== state ? `<span data-filter-value>${alsoState}</span>` : ''}</div>
         </div></div>`);
       }
@@ -136,6 +137,6 @@
 </main>
 
 <!-- In Webflow this goes in Site settings > Custom code > Footer code -->
-<script src="webflow/filter-bar.js?v=auto-spread"></script>
+<script src="webflow/filter-bar.js?v=unique"></script>
 </body>
 </html>

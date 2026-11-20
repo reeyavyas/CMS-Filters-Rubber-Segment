@@ -61,6 +61,9 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 - **Cards can show more than one location.** Secondary offices appear in the teal location bar.
 - **Secondary locations use the same font size and weight** as the home office in that bar.
 - **Every card in the grid stays the same height.** Extra lines (more offices, a wrapped name or title) come out of the photo, not the card's height.
+- **Secondary offices keeps every branch, including two branches in the same city.** The CMS stays complete for profile pages.
+- **A separate single reference, Secondary location, picks the one office shown on the card**, so "Bowling Green, KY" doesn't appear twice.
+- **The script can also hide repeated cities on its own** (`data-filter-unique`), added as an option on November 20, 2026. It shows Secondary offices with each city once, without the extra field.
 
 ## Setup
 
@@ -74,6 +77,8 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 
 These came up but weren't decided:
 
+- **Secondary location or `data-filter-unique`:** keep the Secondary location field for the card, or show Secondary offices with repeats hidden and drop the extra field. The second avoids keeping two fields in sync, and handles advisors with more than one other city.
+- **Secondary location shows on the canvas but not the published site:** check that the chosen branch and the advisor's item are both published, then republish.
 - **Sticky bar:** with many cards, the bar scrolls out of view. It could stick to the top of the screen while scrolling.
 - **Disabled pager buttons:** at full opacity they look the same as active ones. A different text color on `is-disabled` would show the difference.
 - **Extra active-filter styling:** the active filter currently changes text color and background (through the thumb). Bold or an underline would need a small script change.

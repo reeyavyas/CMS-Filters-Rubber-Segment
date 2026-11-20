@@ -17,7 +17,8 @@
 [data-filter-thumb]>*{position:absolute!important;margin:0!important;box-sizing:border-box!important}
 [data-filter-thumb] *{color:inherit!important;background:none!important;border-color:transparent!important;box-shadow:none!important}
 [data-fit-photo]{margin-bottom:calc(-1*var(--fit-extra,0px))}
-[data-fit-photo]~*{position:relative}`;
+[data-fit-photo]~*{position:relative}
+[data-filter-repeat]{display:none!important}`;
   document.head.append(Object.assign(document.createElement('style'), { textContent: STYLE }));
 
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -344,8 +345,24 @@
     });
   });
 
+  // Repeated values (optional): inside a [data-filter-unique] list, an item whose text matches an earlier one
+  // is hidden, like a second "Bowling Green, KY" from two branches in the same city. Collection Items are the
+  // items when the list has any; otherwise its direct children are. Capitals and extra spaces don't count.
+  function hideRepeats() {
+    q('[data-filter-unique]').forEach(list => {
+      const dyn = q('.w-dyn-item', list);
+      const seen = new Set();
+      (dyn.length ? dyn : [...list.children]).forEach(el => {
+        const key = el.textContent.replace(/\s+/g, ' ').trim().toLowerCase();
+        el.toggleAttribute('data-filter-repeat', key !== '' && seen.has(key));
+        seen.add(key);
+      });
+    });
+  }
+
   // Start every bar on the page, then again whenever items land later (Finsweet List Load, CMS pagination)
   function refresh() {
+    hideRepeats();   // before card heights are measured, so hidden repeats don't add a line
     q('[data-filter-bar]').forEach(bar => {
       if (bar.filterBar) return;
       bar.filterBar = createBar(bar);
@@ -361,7 +378,7 @@
     refresh();
     new MutationObserver(records => {
       const added = records.some(r => [...r.addedNodes].some(n => n.nodeType === 1 &&
-        (n.matches('[data-filter-item], [data-filter-bar], [data-fit-photo]') || n.querySelector('[data-filter-item], [data-filter-bar], [data-fit-photo]'))));
+        (n.matches('[data-filter-item], [data-filter-bar], [data-fit-photo], [data-filter-unique]') || n.querySelector('[data-filter-item], [data-filter-bar], [data-fit-photo], [data-filter-unique]'))));
       if (!added || queued) return;
       queued = true;
       setTimeout(() => { queued = false; refresh(); });   // one refresh per batch of added items
