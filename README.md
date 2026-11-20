@@ -10,6 +10,7 @@ You design every part in the Webflow Designer with your own classes. One script 
 |---|---|
 | `webflow/filter-bar.js` | The whole component. Paste it into Webflow, wrapped in a script tag. |
 | `demo.html` | Two working bars with made-up sample data: 100 advisors across 8 states at 12 per page, and events by type. Its `<style>` block stands in for the classes you build in Webflow. |
+| `DECISIONS.md` | The design and build decisions behind this component, and what's still open. |
 
 ## How it behaves
 
