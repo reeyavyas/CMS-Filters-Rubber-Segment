@@ -245,27 +245,37 @@
     };
   }
 
-  // Card motion: when a filter or page changes, cards that appear scale up with a small bounce (94% to 102%
-  // to 100%) while fading in, one after another, and cards that stay glide to their new spot with a matching
-  // small overshoot. data-filter-card-motion="off" on the bar turns it off. Only transform and opacity move,
-  // and reduced motion turns it off too.
+  // Card motion: when a filter or page changes, every visible card answers, in grid order, 40ms apart:
+  // - cards that appear scale up with a small bounce (94% to 102% to 100%) while fading in
+  // - cards that stay but move glide from their old spot, with a matching small overshoot
+  // - cards that stay in the same spot bounce in place (100% to 102% to 100%), without fading
+  // data-filter-card-motion="off" on the bar turns it off. Only transform and opacity move, and reduced
+  // motion turns it off too.
   const POP_MS = 520, STAGGER_MS = 40, GLIDE_EASE = 'cubic-bezier(.34,1.3,.64,1)';
+  const UP = 'cubic-bezier(.2,.8,.2,1)', SETTLE = 'cubic-bezier(.4,0,.2,1)';
   function animateCards(items, before) {
     let n = 0;
     items.forEach(item => {
       if (item.hidden) return;
       const now = item.getBoundingClientRect(), was = before.get(item);
-      if (was) {
-        const dx = was.left - now.left, dy = was.top - now.top;
-        if (Math.abs(dx) + Math.abs(dy) < 1) return;
+      const delay = Math.min(n++, 12) * STAGGER_MS;   // stops growing after 12 cards, so a long list doesn't drag
+      if (!was) {
+        item.animate([
+          { opacity: 0, transform: 'scale(.94)', easing: UP },
+          { opacity: 1, transform: 'scale(1.02)', offset: 0.6, easing: SETTLE },
+          { opacity: 1, transform: 'scale(1)' },
+        ], { duration: POP_MS, delay, fill: 'backwards' });
+        return;
+      }
+      const dx = was.left - now.left, dy = was.top - now.top;
+      if (Math.abs(dx) + Math.abs(dy) >= 1) {
         item.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: POP_MS, easing: GLIDE_EASE });
       } else {
-        // the stagger stops growing after 12 cards, so a long list doesn't take seconds to finish
         item.animate([
-          { opacity: 0, transform: 'scale(.94)', easing: 'cubic-bezier(.2,.8,.2,1)' },
-          { opacity: 1, transform: 'scale(1.02)', offset: 0.6, easing: 'cubic-bezier(.4,0,.2,1)' },
-          { opacity: 1, transform: 'scale(1)' },
-        ], { duration: POP_MS, delay: Math.min(n++, 12) * STAGGER_MS, fill: 'backwards' });
+          { transform: 'scale(1)', easing: UP },
+          { transform: 'scale(1.02)', offset: 0.6, easing: SETTLE },
+          { transform: 'scale(1)' },
+        ], { duration: POP_MS, delay });
       }
     });
   }

@@ -61,7 +61,7 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 - **Cards can show more than one location.** Secondary offices appear in the teal location bar.
 - **Secondary locations use the same font size and weight** as the home office in that bar.
 - **Every card in the grid stays the same height.** Extra lines (more offices, a wrapped name or title) come out of the photo, not the card's height.
-- **Cards animate when the filter or page changes, with a subtle scale-up and bounce:** new cards go from 94% to 102% to 100% while fading in, staggered 40ms apart, and cards that stay glide to their new spot. Search typing doesn't animate, and reduced motion turns it off. (November 20, 2026)
+- **Cards animate when the filter or page changes, with a subtle scale-up and bounce:** new cards go from 94% to 102% to 100% while fading in, staggered 40ms apart, cards that stay glide to their new spot, and cards that stay in the same spot (like an advisor in both Kentucky and Tennessee) bounce in place without fading. Search typing doesn't animate, and reduced motion turns it off. (November 20, 2026)
 - **Secondary offices keeps every branch, including two branches in the same city.** The CMS stays complete for profile pages.
 - **A separate single reference, Secondary location, picks the one office shown on the card**, so "Bowling Green, KY" doesn't appear twice.
 - **The script can also hide repeated cities on its own** (`data-filter-unique`), added as an option on November 20, 2026. It shows Secondary offices with each city once, without the extra field.

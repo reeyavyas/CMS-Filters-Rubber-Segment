@@ -18,7 +18,7 @@ You design every part in the Webflow Designer with your own classes. One script 
 - **Options build themselves** from the values on your items, A to Z by default. "All" always comes first. When an item with a new value appears, its option appears too.
 - **The thumb** stretches from the old option to the new one, then squashes into place. You can drag or flick it. With reduced motion turned on, it jumps with no animation.
 - **Search** matches as you type, and works together with the options.
-- **Card motion:** when someone picks a filter or changes pages, new cards scale up with a small bounce and fade in one after another, and cards that stay glide to their new spot. Typing in search stays instant.
+- **Card motion:** when someone picks a filter or changes pages, new cards scale up with a small bounce and fade in one after another, cards that stay glide to their new spot, and cards that don't move bounce in place. Typing in search stays instant.
 - **Pagination (optional):** filters every item first, then shows a page of matches, like 12 at a time, with Previous, Next and page numbers you design.
 - **Keyboard:** Tab reaches the options, and the arrow keys, Home and End move between them.
 - **Wrapping:** if the options wrap onto more lines, the thumb stretches between lines.
@@ -300,7 +300,9 @@ Add these to the bar element (`filter-bar`) as custom attributes:
 The cards animate on their own when someone picks a filter or changes pages. You don't build anything for it, and you shouldn't add Webflow Interactions to the cards, because they would fight with it.
 
 - **Cards that appear** scale up from 94% to 102%, then settle at 100%, while fading in. Each starts 40ms after the one before. The whole move takes about half a second.
-- **Cards that stay** (they match both the old and the new filter) glide from their old spot to their new one, with the same small overshoot.
+- **Cards that stay but move** (they match both the old and the new filter) glide from their old spot to their new one, with the same small overshoot.
+- **Cards that stay in the same spot** bounce in place, from 100% to 102% and back, without fading. For example, an advisor in both Kentucky and Tennessee who's first in both lists.
+- **Every visible card takes part, in grid order,** each starting 40ms after the one before (capped after 12 cards).
 - **Typing in search doesn't animate,** so results keep up with each keystroke.
 - **Reduced motion turns it off.** With Reduce Motion on in someone's device settings, cards simply appear.
 - **To turn it off for one bar,** add `data-filter-card-motion` = `off` to the bar.
