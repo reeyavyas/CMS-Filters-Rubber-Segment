@@ -296,6 +296,18 @@
     });
   }
 
+  // Count and range wording: {name} is replaced with its value, and a part in [square brackets] shows only
+  // when every {name} inside it has a value. The count's default is "{count} {noun}[ in {filter}][ matching “{search}”]"
+  // and the range's is "Showing {from} to {to} of {total}". Change them per element with
+  // data-filter-status-template and data-filter-range-template.
+  function fillTemplate(template, values) {
+    const has = key => values[key] !== undefined && values[key] !== '';
+    return template
+      .replace(/\[([^\]]*)\]/g, (_, part) => ([...part.matchAll(/\{(\w+)\}/g)].every(m => has(m[1])) ? part : ''))
+      .replace(/\{(\w+)\}/g, (_, key) => (has(key) ? values[key] : ''))
+      .replace(/\s+/g, ' ').trim();
+  }
+
   // Filters every item in the group first, then shows one page of the matches (all of them without a
   // pager). A filter or search change goes back to page 1; keepPage stays on the current page.
   // animate is true for filter and page changes, so typing in search stays instant.
@@ -319,13 +331,17 @@
     items.forEach(item => { item.hidden = !onPage.has(item); });
 
     const shown = matched.length;
-    const labels = bars.map(b => b.label()).filter(Boolean), words = bars.map(b => b.query()).filter(Boolean);
+    const filter = bars.map(b => b.label()).filter(Boolean).join(', '), search = bars.map(b => b.query()).filter(Boolean).join(' ');
     q(attr('data-filter-status', group)).forEach(el => {
       const one = el.dataset.filterNoun || 'item', many = el.dataset.filterNounPlural || `${one}s`;
       el.setAttribute('role', 'status');
-      el.textContent = `${shown} ${shown === 1 ? one : many}${labels.length ? ` in ${labels.join(', ')}` : ''}${words.length ? ` matching “${words.join(' ')}”` : ''}`;
+      el.textContent = fillTemplate(el.dataset.filterStatusTemplate || '{count} {noun}[ in {filter}][ matching “{search}”]',
+        { count: shown, noun: shown === 1 ? one : many, filter, search });
     });
-    q(attr('data-filter-range', group)).forEach(el => { el.textContent = shown ? `Showing ${start + 1} to ${start + onPage.size} of ${shown}` : ''; });
+    q(attr('data-filter-range', group)).forEach(el => {
+      el.textContent = shown ? fillTemplate(el.dataset.filterRangeTemplate || 'Showing {from} to {to} of {total}',
+        { from: start + 1, to: start + onPage.size, total: shown }) : '';
+    });
     q(attr('data-filter-empty', group)).forEach(el => el.toggleAttribute('data-filter-show', shown === 0));
     pagers.forEach(p => renderPager(p, page, count));
     q('[data-fit-photo]').forEach(fit);   // cards just shown get their height now, not on the next frame

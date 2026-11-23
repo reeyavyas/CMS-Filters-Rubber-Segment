@@ -49,6 +49,7 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 - **Use full state names for now** ("Indiana"). You'll switch to two-letter codes ("IN") only if the list grows too long.
 - **Screen readers get the full name** when a short code is used. `data-filter-name` supports this, ready for later.
 - **Font sizes are set in Webflow**, not in the code.
+- **The count's wording is a template you can change per instance** (`data-filter-status-template`), so other lists can read naturally, like "6 Retirement articles." The default stays "13 advisors in Kentucky." (November 23, 2026)
 
 ## Pagination
 

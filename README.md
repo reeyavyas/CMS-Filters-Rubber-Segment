@@ -209,6 +209,31 @@ Both can go anywhere on the page. Inside `filter-wrapper`, under the bar, is a g
 2. Add `data-filter-status` = `advisors`.
 3. Add `data-filter-noun` = `advisor`. It shows as "13 advisors in Indiana."
 4. Optional: add `data-filter-noun-plural` if the plural isn't the noun plus "s," like `people` for `person`.
+5. Optional: change the wording with `data-filter-status-template`. Without it, the count reads like "11 advisors," "13 advisors in Kentucky" or "1 advisor in Kentucky matching “rosa”."
+
+**Count wording (optional)**
+
+The count is built from a template. Write it in `data-filter-status-template` on the count's Text Block:
+
+| You type | It becomes |
+|---|---|
+| `{count}` | The number of matches, like `13` |
+| `{noun}` | Your `data-filter-noun` for 1, or the plural for everything else |
+| `{filter}` | The selected filter, like `Kentucky`. Empty when "All" is selected. |
+| `{search}` | What's typed in the search field. Empty when the field is empty. |
+| `[ … ]` | Square brackets around a part show it **only when every `{…}` inside has a value**, so "in Kentucky" disappears when "All" is selected |
+
+| Template | With "All" | With a filter |
+|---|---|---|
+| (default) `{count} {noun}[ in {filter}][ matching “{search}”]` | 11 advisors | 13 advisors in Kentucky |
+| `{count}[ {filter}] {noun}` | 6 articles | 6 Retirement articles |
+| `[{filter}: ]{count} {noun}` | 4 events | Workshop: 2 events |
+| `Showing {count} {noun}[ near {filter}]` | Showing 11 advisors | Showing 13 advisors near Kentucky |
+
+- Leave out a placeholder you don't need, like `{search}` on a bar without search.
+- Spaces inside the brackets belong to that part, so put the space before the words inside the bracket: `[ in {filter}]`, not ` [in {filter}]`.
+- Square brackets are reserved for optional parts, so they can't appear as visible text.
+- The count is announced to screen readers when it changes, so write it as a full phrase that makes sense read aloud.
 
 **The empty message**
 1. Add a **Text Block** (or any element) with the class `filter-empty`. Type what people see when nothing matches, like "No advisors match. Try a different name, city or state."
@@ -279,7 +304,7 @@ To use other names, add `data-filter-current-class` or `data-filter-disabled-cla
 
 **Also good to know**
 - The pager hides itself when everything fits on one page.
-- Optional: a Text Block with `data-filter-range` = `advisors` shows "Showing 13 to 24 of 100."
+- Optional: a Text Block with `data-filter-range` = `advisors` shows "Showing 13 to 24 of 100." To word it differently, add `data-filter-range-template` with `{from}`, `{to}` and `{total}`, like `{from}-{to} of {total} advisors`.
 - Changing pages scrolls back to the bar when it's above the screen. If you have a sticky header, give the bar a top **scroll margin** so the header doesn't cover it.
 
 ### Step 7: Optional settings on the bar
@@ -376,10 +401,11 @@ Instead of typing the group name into each attribute, connect those attributes t
    - `data-filter-empty` on the empty message
    - `data-filter-pagination` and `data-filter-range`, if your pager or range text is inside the Component
 4. **Noun:** select the count text. Connect `data-filter-noun` to a new **Text** property named **Noun**, default `advisor`. If some collections need an unusual plural, also connect `data-filter-noun-plural` to a property named **Noun plural**.
-5. **Label:** select the bar. Connect `data-filter-label` to a new **Text** property named **Label**, default `Filter advisors by state`.
-6. **Show search:** select the search Form Block. In **Element settings**, connect its **Visibility** to a new **Visibility** property named **Show search**, default on.
-7. **Empty message text:** select the empty message's text and connect it to a new **Text** property named **Empty message**, so each collection can say something fitting, like "No events match."
-8. Optional: connect `data-filter-sort` on the bar to a **Text** property named **Sort**. Leave it empty for A to Z, or type `cms` on an instance to keep CMS order.
+5. **Count template:** on the count text, connect `data-filter-status-template` to a new **Text** property named **Count template**. Leave it empty for the default wording, or type a template per instance, like `{count}[ {filter}] {noun}` for "6 Retirement articles." See [Count wording](#step-4-count-and-empty-message-optional).
+6. **Label:** select the bar. Connect `data-filter-label` to a new **Text** property named **Label**, default `Filter advisors by state`.
+7. **Show search:** select the search Form Block. In **Element settings**, connect its **Visibility** to a new **Visibility** property named **Show search**, default on.
+8. **Empty message text:** select the empty message's text and connect it to a new **Text** property named **Empty message**, so each collection can say something fitting, like "No events match."
+9. Optional: connect `data-filter-sort` on the bar to a **Text** property named **Sort**. Leave it empty for A to Z, or type `cms` on an instance to keep CMS order.
 
 **A bar without search spreads its filters on its own.** When an instance has **Show search** off, the script adds the `is-spread` combo class to its "All" option (and so to every filter), and the filters share the bar's width evenly. You style `is-spread` once (see [2c](#2c-the-all-option)). To use a different class name, add `data-filter-spread-class` to the bar.
 
@@ -395,6 +421,7 @@ These steps add an events filter. Swap in your own collection and names.
    - **Label:** `Filter events by type`
    - **Show search:** on or off
    - **Empty message:** your text, like "No events match. Try another type."
+   - **Count template** (optional): leave empty for "4 events in Workshop," or type one like `{count}[ {filter}] {noun}` for "2 Workshop events."
 
 **2. Tag the Events Collection List**
 1. Select the Events **Collection List**. Turn **pagination off**, and make sure no item limit cuts events off (up to 100; past 100, see [Finsweet List Load](#more-than-100-items-finsweet-list-load)).
@@ -417,7 +444,7 @@ Follow [Step 6](#step-6-pagination-optional), using `events` as the group name i
 **6. Publish and check**
 - The events filter shows All, then only the event types that events actually have.
 - Filtering events doesn't change the advisors filter on the same page, and the other way around.
-- The count reads "4 events in Workshop," using the instance's noun.
+- The count reads "4 events in Workshop," using the instance's noun, or your Count template's wording.
 
 ### Several instances on one page
 
@@ -490,6 +517,5 @@ Check that nested Collection Lists (like states inside each item) come through o
 - I tested the filter with up to 150 items on one page. Every filter, search keystroke and page change took under 6ms.
 - The search field sits inside the filter group, so screen readers hear it as part of "Filter advisors by state." It has its own label, so it's still usable.
 - With many filters, the search field stays near its 240px minimum, because the filters claim its line first.
-- The count reads "in" before the active option (for example "in Kentucky"). Change that word in the script if it reads oddly for another list.
 - The filter doesn't change the URL, so you can't share a link to a filtered view.
 - There's no limit on how much of a photo equal heights can cover.

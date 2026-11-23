@@ -68,7 +68,7 @@
 </style>
 <!-- Loaded in the head so its CSS is in place before the bar draws: no white bar or empty-message flash.
      In Webflow: a Code Embed above the bar, or the page's "Inside <head> tag" custom code. -->
-<script src="webflow/filter-bar.js?v=no-flash"></script>
+<script src="webflow/filter-bar.js?v=templates"></script>
 </head>
 <body>
 <main class="page">
@@ -130,7 +130,7 @@
     <a href="#" class="filter-option" data-filter-option>All</a>
     <div class="filter-thumb" data-filter-thumb></div>
   </div>
-  <p class="filter-status" data-filter-status="events" data-filter-noun="event"></p>
+  <p class="filter-status" data-filter-status="events" data-filter-noun="event" data-filter-status-template="{count}[ {filter}] {noun}"></p>
   <div class="grid" role="list">
     <div class="event" role="listitem" data-filter-item="events"><span class="event-tag" data-filter-value>Workshop</span><h3>Planning for retirement</h3></div>
     <div class="event" role="listitem" data-filter-item="events"><span class="event-tag" data-filter-value>Webinar</span><h3>Reading your statement</h3></div>
