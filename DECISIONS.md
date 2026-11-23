@@ -71,6 +71,8 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 ## Setup
 
 - **No white bar or empty-message flash on page load.** The script loads above the bar (a Code Embed as the first child of the filter's Component, or the page's head code), so its CSS hides the thumb until it's placed and keeps the empty message hidden unless nothing matches. (November 23, 2026)
+- **The empty message shows on zero matches even if its class is Display: None**, and the script warns in the browser console when a piece's group name matches no bar, which is what usually hides it after a rename. (November 23, 2026)
+- **The search Form Block's success and error messages are hidden, not deleted**, because Webflow doesn't allow deleting them.
 - **Install the script at the page level for now, not site-wide.**
 - **Keep page settings minimal** by putting the script in a Code Embed inside the filter's Component.
 - **Remove unnecessary code** wherever possible.

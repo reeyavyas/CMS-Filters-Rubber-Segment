@@ -122,17 +122,18 @@ Don't bind the bar to the CMS or add a filter for each state. The script adds on
 
 Putting the search field **inside the bar, as its first child**, lets the filters fill the rest of its line. Filters that don't fit wrap to the next line, starting under the search field.
 
-1. From the **Add** panel, drag a **Form Block** inside the bar, above everything else in it. Give the form the class `filter-search`.
-2. Inside the Form Block, delete the **Submit button**, the **Success message** and the **Error message**. If it has a **Field label**, delete that too.
-3. Select the **Input**. In Element settings, set **Type** to Plain, clear its **Name** if you like, and type a **Placeholder**, like "Search by name or city."
-4. On the Input, add the attribute `data-filter-search` = `true`. Pressing Enter won't submit the form.
-5. Also on the Input, add `aria-label` = `Search advisors`, so screen readers know what the field does without a visible label.
-6. Give the Input the class `filter-input` and style how it looks: height (38px matches the filters), padding, background, text color, placeholder color and corner radius.
-7. Style the Form Block:
+1. From the **Add** panel, drag a **Form Block** inside the bar, above everything else in it. Give the **Form Block** itself (the outer element Webflow names "Form Block," which sits in the bar's row) the class `filter-search`.
+2. Inside the form, delete the **Submit button**. If it has a **Field label**, delete that too.
+3. Leave the **Success message** and **Error message**. Webflow doesn't let you delete them. Hide them instead (a class set to Display: None works). They'd never appear anyway, because this form never submits: the script stops Enter from sending it. Hiding them doesn't affect the filter, since the script only looks at the Input.
+4. Select the **Input**. In Element settings, set **Type** to Plain, clear its **Name** if you like, and type a **Placeholder**, like "Search by name or city."
+5. On the Input, add the attribute `data-filter-search` = `true`. Pressing Enter won't submit the form.
+6. Also on the Input, add `aria-label` = `Search advisors`, so screen readers know what the field does without a visible label.
+7. Give the Input the class `filter-input` and style how it looks: height (38px matches the filters), padding, background, text color, placeholder color and corner radius. Set its **margins to 0**: Webflow gives inputs a 10px bottom margin by default, which pushes the field out of line with the filters.
+8. Style the Form Block:
 
 | Breakpoint | Style panel settings |
 |---|---|
-| Desktop | **Layout (Flex Child):** Custom, Grow `1000`, Shrink `0`, Basis `240px`. **Size:** Width `400px`, Max W `400px`. **Spacing:** margin right 12px, all other margins 0. |
+| Desktop | **Layout (Flex Child):** Custom, Grow `1000`, Shrink `0`, Basis `240px`. **Size:** Width `400px`, Max W `400px`. **Spacing:** margin right 12px, **all other margins 0** (Webflow gives Form Blocks a 15px bottom margin by default). **Position:** Relative, so an icon inside can be placed against it. |
 | Mobile portrait | **Layout (Flex Child):** Basis `100%`. **Size:** Width Auto, Max W None. **Spacing:** margin right 0. |
 
 The search field starts at 240px wide. If its line has room left after the filters, it grows first, up to 400px. On Mobile portrait it takes a full line of its own, and the row gap spaces it from the filters.
@@ -238,6 +239,8 @@ The count is built from a template. Write it in `data-filter-status-template` on
 **The empty message**
 1. Add a **Text Block** (or any element) with the class `filter-empty`. Type what people see when nothing matches, like "No advisors match. Try a different name, city or state."
 2. Add `data-filter-empty` = `team`. On the published site it stays hidden from the moment the page loads, and shows only when nothing matches. In the Designer it stays visible, so you can style it.
+   - You don't need to hide it yourself. If you do give its class Display: None, the script still shows it when nothing matches, as **Block**. To show it as something else, add `data-filter-empty-display` with that value, like `flex`.
+   - Its `data-filter-empty` value must match the bar's group name exactly. If it doesn't, it never shows, and the browser console says which name doesn't match.
 
 ### Step 5: Connect your items
 
@@ -510,6 +513,8 @@ Check that nested Collection Lists (like states inside each item) come through o
 | What you see | Likely cause |
 |---|---|
 | Nothing happens | The script isn't in a Code Embed, the page's head code or the site's Head code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
+| The count reads "0 … matching" but the empty message doesn't show | The empty message's `data-filter-empty` doesn't match the bar's group name, often after a rename. Open the browser console on the published page: the script names the attribute and value that don't match. |
+| A yellow "Filter Bar: … doesn't match any data-filter-bar" warning in the console | That piece has a different group name from every bar on the page. Change it to match, or connect it to the Component's Group property. |
 | Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
 | Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 6). |
 | The thumb is missing | The bar needs a `data-filter-thumb` element inside it. The browser console names the bar. |

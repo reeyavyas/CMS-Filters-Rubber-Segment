@@ -351,7 +351,13 @@
       el.textContent = shown ? fillTemplate(el.dataset.filterRangeTemplate || 'Showing {from} to {to} of {total}',
         { from: start + 1, to: start + onPage.size, total: shown }) : '';
     });
-    q(attr('data-filter-empty', group)).forEach(el => el.toggleAttribute('data-filter-show', shown === 0));
+    q(attr('data-filter-empty', group)).forEach(el => {
+      const show = shown === 0;
+      el.toggleAttribute('data-filter-show', show);
+      // If your own class hides it (Display: None), show it anyway: as block, or data-filter-empty-display (like flex)
+      el.style.removeProperty('display');
+      if (show && getComputedStyle(el).display === 'none') el.style.display = el.dataset.filterEmptyDisplay || 'block';
+    });
     pagers.forEach(p => renderPager(p, page, count));
     q('[data-fit-photo]').forEach(fit);   // cards just shown get their height now, not on the next frame
     if (motion) animateCards(items, before);
@@ -457,6 +463,21 @@
     q('[data-filter-pagination]').forEach(p => { if (!p.filterPager) setupPager(p); });
     groups.forEach((bars, g) => { bars.forEach(b => b.sync()); applyGroup(g, true); });
     watchFit();
+    warnUnmatched();
+  }
+
+  // A piece whose group name matches no bar never updates, usually after a rename that missed one.
+  // Say so in the browser console (once per piece), so it's easy to find.
+  const warned = new Set();
+  function warnUnmatched() {
+    if (!groups.size) return;
+    ['data-filter-item', 'data-filter-status', 'data-filter-empty', 'data-filter-pagination', 'data-filter-range'].forEach(a => {
+      new Set(q(`[${a}]`).map(el => el.getAttribute(a))).forEach(g => {
+        if (groups.has(g) || warned.has(`${a}=${g}`)) return;
+        warned.add(`${a}=${g}`);
+        console.warn(`Filter Bar: ${a}="${g}" doesn't match any data-filter-bar on this page (groups here: ${[...groups.keys()].join(', ')}). Check the group name.`);
+      });
+    });
   }
   let queued = false;
   const start = () => {
