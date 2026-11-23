@@ -36,6 +36,7 @@ This is the finished structure in the **Navigator** panel. Indents show what sit
 
 ```
 Filter (Component)                  filter-wrapper
+├─ Code Embed (the script)          hidden           (display: none)   ← first, above the bar
 ├─ Bar                              filter-bar       data-filter-bar = advisors
 │                                                    data-filter-options = true
 │  ├─ Search Form Block             filter-search
@@ -43,8 +44,7 @@ Filter (Component)                  filter-wrapper
 │  ├─ "All" option (Button)         filter-option    data-filter-option = true
 │  └─ Thumb (empty Div Block)       filter-thumb     data-filter-thumb = true
 ├─ Count text                       filter-status    data-filter-status = advisors
-├─ Empty message                    filter-empty     data-filter-empty = advisors
-└─ Code Embed (the script)          hidden           (display: none)
+└─ Empty message                    filter-empty     data-filter-empty = advisors
 
 Advisors Collection List            your grid        (Step 5)
 └─ Collection Item                                   data-filter-item = advisors
@@ -74,21 +74,21 @@ Pick one option. You need a paid site plan for custom code. The script is about 
 The script then travels with the bar, and page settings stay empty.
 
 1. Add a **Div Block** to the page where the bar should go. Give it the class `filter-wrapper`. You'll put the bar, count and empty message inside it in the next steps.
-2. From the **Add** panel, drag a **Code Embed** inside `filter-wrapper`, **beside where the bar will go, not inside the bar**. Webflow wraps every Embed in its own div, and inside the bar that div would add an extra gap.
+2. From the **Add** panel, drag a **Code Embed** inside `filter-wrapper` as its **first child, above where the bar will go**. Not inside the bar: Webflow wraps every Embed in its own div, and inside the bar that div would add an extra gap.
 3. In the code window, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`. Click **Save & Close**.
 4. Give the Embed the class `hidden` and set **Display: None** in the Style panel. The script still runs.
 5. When Steps 2 to 4 are done, right-click `filter-wrapper` and choose **Create component**, so you can reuse the whole filter on other pages. To use it with other collections, set up the Component's properties next (see [Use it with other collections](#use-it-with-other-collections)).
 
-The Embed can sit above or below the bar. The script waits for the page to finish loading, and it runs only once even if the Component appears twice on a page.
+**The Embed must come before the bar, the empty message and the cards.** The script adds a little CSS the moment it loads: it keeps the thumb hidden until it's placed, and keeps the empty message hidden unless nothing matches. If the Embed sits below them, the browser draws them first, and you see a white bar and the empty message flash on page load. The script itself waits for the page to finish loading before it builds the filters, and it runs only once even if the Component appears twice on a page.
 
 **Option B: page settings**
 
 1. In the **Pages** panel, hover over the page and click its **gear icon**.
 2. Scroll to **Custom Code**.
-3. In **Before `</body>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
+3. In **Inside `<head>` tag**, type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 4. Click **Save**.
 
-Use the Before `</body>` field, not the head field. On a CMS template page, the script runs for every item that uses the template. Each page with a bar needs its own copy.
+Use the **head** field, not Before `</body>`. In the head, the script's CSS is ready before the bar draws, so there's no white bar or empty-message flash on page load. The script waits for the page to finish loading before it builds the filters, so the head is safe. On a CMS template page, the script runs for every item that uses the template. Each page with a bar needs its own copy.
 
 ### Step 2: Build the bar
 
@@ -212,7 +212,7 @@ Both can go anywhere on the page. Inside `filter-wrapper`, under the bar, is a g
 
 **The empty message**
 1. Add a **Text Block** (or any element) with the class `filter-empty`. Type what people see when nothing matches, like "No advisors match. Try a different name, city or state."
-2. Add `data-filter-empty` = `advisors`. The script hides it until nothing matches.
+2. Add `data-filter-empty` = `advisors`. On the published site it stays hidden from the moment the page loads, and shows only when nothing matches. In the Designer it stays visible, so you can style it.
 
 ### Step 5: Connect your items
 
@@ -333,7 +333,7 @@ Custom code doesn't run in the Designer or Preview mode. Publish to your **webfl
 
 Instead of Step 1, paste the script once for every page:
 
-1. Open **Site settings**, then **Custom code**, then **Footer code**.
+1. Open **Site settings**, then **Custom code**, then **Head code** (not Footer code, which loads too late and causes a white bar and empty-message flash on page load).
 2. Type `<script>`, paste the whole of `webflow/filter-bar.js`, then type `</script>`.
 3. Save and publish.
 
@@ -473,13 +473,14 @@ Check that nested Collection Lists (like states inside each item) come through o
 
 | What you see | Likely cause |
 |---|---|
-| Nothing happens | The script isn't in a Code Embed, the page's Before `</body>` field or Footer code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
+| Nothing happens | The script isn't in a Code Embed, the page's head code or the site's Head code, it's missing its script tags, or you're in Preview mode. Custom code only runs on the published site. |
 | Only "All" shows | Items have no `data-filter-value`, or the bar and items use different group names |
 | Filters miss cards on other pages | Webflow's "Paginate items" is on without Finsweet List Load. Use the bar's own pager instead (Step 6). |
 | The thumb is missing | The bar needs a `data-filter-thumb` element inside it. The browser console names the bar. |
 | The active label is the wrong color | Set the text color on the thumb, not on the option |
 | Search sits on its own line on a tablet or desktop | The search Form Block isn't directly inside the bar, or its Mobile portrait settings were set on a larger breakpoint. Make it the bar's first child, and keep the full-width settings on Mobile portrait only. |
-| An extra gap inside the bar | The Code Embed sits inside the bar. Move it beside the bar. |
+| An extra gap inside the bar | The Code Embed sits inside the bar. Move it above the bar, as the first child of `filter-wrapper`. |
+| The whole bar flashes white, or the empty message flashes, on page load | The script loads after the bar. Move the Code Embed above the bar, or use the head code field instead of Before `</body>` or Footer code. |
 | Empty gaps in the grid | `data-filter-item` is on the card instead of the Collection Item, or items are pinned to grid cells |
 | Enter reloads the page | The Input isn't the one with `data-filter-search` |
 

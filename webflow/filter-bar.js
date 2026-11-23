@@ -6,8 +6,13 @@
   window.filterBarLoaded = true;
 
   // Functional CSS only: positioning, hiding and hit areas. Colors, sizes and spacing stay in your classes.
+  // The empty message stays hidden until the script finds no matches, and the thumb stays hidden until it's
+  // placed, so neither flashes on page load. That needs this CSS in place before the bar draws: load the script
+  // in the page's head, or in a Code Embed above the bar.
   const STYLE = `
-[data-filter-item][hidden],[data-filter-empty][hidden],[data-filter-pagination][hidden]{display:none!important}
+[data-filter-item][hidden],[data-filter-pagination][hidden]{display:none!important}
+[data-filter-empty]:not([data-filter-show]){display:none!important}
+[data-filter-thumb]:not([data-filter-ready]){visibility:hidden}
 [data-filter-prev],[data-filter-next],[data-filter-page]{cursor:pointer}
 [data-filter-options]{position:relative;touch-action:pan-y;-webkit-user-select:none;user-select:none}
 [data-filter-options] input,[data-filter-options] textarea{-webkit-user-select:text;user-select:text}
@@ -114,6 +119,7 @@
         Object.assign(c.style, { left: `${l}px`, top: `${t}px`, width: `${r - l}px`, height: `${b - t}px` });
       });
       thumb.style.clipPath = clip(rect(active));
+      thumb.setAttribute('data-filter-ready', '');
     };
 
     function animateTo(frames) {
@@ -320,7 +326,7 @@
       el.textContent = `${shown} ${shown === 1 ? one : many}${labels.length ? ` in ${labels.join(', ')}` : ''}${words.length ? ` matching “${words.join(' ')}”` : ''}`;
     });
     q(attr('data-filter-range', group)).forEach(el => { el.textContent = shown ? `Showing ${start + 1} to ${start + onPage.size} of ${shown}` : ''; });
-    q(attr('data-filter-empty', group)).forEach(el => { el.hidden = shown > 0; });
+    q(attr('data-filter-empty', group)).forEach(el => el.toggleAttribute('data-filter-show', shown === 0));
     pagers.forEach(p => renderPager(p, page, count));
     q('[data-fit-photo]').forEach(fit);   // cards just shown get their height now, not on the next frame
     if (motion) animateCards(items, before);
