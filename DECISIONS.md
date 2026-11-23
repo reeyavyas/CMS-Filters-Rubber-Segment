@@ -72,9 +72,11 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 - **Install the script at the page level for now, not site-wide.**
 - **Keep page settings minimal** by putting the script in a Code Embed inside the filter's Component.
 - **Remove unnecessary code** wherever possible.
-- **The GitHub repo, "CMS Filters Rubber Segment," is public.** (Confirmed November 23, 2026.)
+- **The GitHub repo, "CMS Filters Rubber Segment," is public only while it's being built.** When it's done, it becomes private and moves to your work account. (Confirmed November 23, 2026.)
   - Earlier: it was created private.
-  - Because it's public, nothing private goes in it: no keys, no real names or phone numbers, and no screenshots.
+  - While it's public, nothing private goes in it: no keys, no real names or phone numbers, and no screenshots.
+  - Making it private later stops new visitors, but doesn't take back copies anyone already cloned or forked while it was public.
+- **Don't load the script from a public link like jsDelivr.** It only works while the repo is public. Once the repo is private and on your work account, the link would stop updating, and pages relying on it could break. The script stays pasted into Webflow.
 - **The README needs full, step-by-step detail**, including Webflow-specific settings and anything easy to miss.
 
 ## Still open
@@ -86,5 +88,4 @@ These came up but weren't decided:
 - **Sticky bar:** with many cards, the bar scrolls out of view. It could stick to the top of the screen while scrolling.
 - **Disabled pager buttons:** at full opacity they look the same as active ones. A different text color on `is-disabled` would show the difference.
 - **Extra active-filter styling:** the active filter currently changes text color and background (through the thumb). Bold or an underline would need a small script change.
-- **Loading the script from a public link:** now that the repo is public, the Code Embed could shrink to one line that loads the script from jsDelivr. The tradeoff: every page would depend on jsDelivr being up, and a script change would reach the live site without republishing in Webflow.
 - **The search field's place for screen readers:** it sits inside the filter group, so screen readers hear it as part of that group. Not yet tested with a real screen reader.
