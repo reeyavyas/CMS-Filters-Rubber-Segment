@@ -37,20 +37,20 @@ This is the finished structure in the **Navigator** panel. Indents show what sit
 ```
 Filter (Component)                  filter-wrapper
 ├─ Code Embed (the script)          hidden           (display: none)   ← first, above the bar
-├─ Bar                              filter-bar       data-filter-bar = advisors
+├─ Bar                              filter-bar       data-filter-bar = team
 │                                                    data-filter-options = true
 │  ├─ Search Form Block             filter-search
 │  │  └─ Input                      filter-input     data-filter-search = true
 │  ├─ "All" option (Button)         filter-option    data-filter-option = true
 │  └─ Thumb (empty Div Block)       filter-thumb     data-filter-thumb = true
-├─ Count text                       filter-status    data-filter-status = advisors
-└─ Empty message                    filter-empty     data-filter-empty = advisors
+├─ Count text                       filter-status    data-filter-status = team
+└─ Empty message                    filter-empty     data-filter-empty = team
 
 Advisors Collection List            your grid        (Step 5)
-└─ Collection Item                                   data-filter-item = advisors
+└─ Collection Item                                   data-filter-item = team
    └─ your card …                                    data-filter-value on the state names
 
-Pager (optional)                    pager            data-filter-pagination = advisors   (Step 6)
+Pager (optional)                    pager            data-filter-pagination = team   (Step 6)
 ```
 
 ### How to add a custom attribute
@@ -60,7 +60,7 @@ You'll do this for most elements, so here it is once:
 1. Select the element on the canvas or in the Navigator.
 2. Open the **Element settings** panel (the gear icon in the right sidebar, or press **D**).
 3. Scroll to **Custom attributes** and click **+**.
-4. Type the **Name** (for example `data-filter-bar`) and the **Value** (for example `advisors`).
+4. Type the **Name** (for example `data-filter-bar`) and the **Value** (for example `team`).
 5. Click **Save**.
 
 Where a value doesn't matter, type `true`.
@@ -92,7 +92,7 @@ Use the **head** field, not Before `</body>`. In the head, the script's CSS is r
 
 ### Step 2: Build the bar
 
-Pick a **group name** first. These steps use `advisors`. The group name ties the bar to its items, count, empty message and pager, so two bars on one page never interfere.
+Pick a **group name** first. These steps use `team`. The group name ties the bar to its items, count, empty message and pager, so two bars on one page never interfere.
 
 Build each element at the **Desktop** breakpoint first (the base, with the desktop icon selected at the top of the canvas). Then make the Tablet and Mobile portrait changes listed under each element. Webflow carries a breakpoint's settings down to the smaller ones, so Tablet settings also apply to Mobile landscape.
 
@@ -101,7 +101,7 @@ Build each element at the **Desktop** breakpoint first (the base, with the deskt
 One element is the bar's background and also the track that holds the search field, the filters and the thumb. It decides how they wrap.
 
 1. Inside `filter-wrapper`, add a **Div Block**. Give it the class `filter-bar`.
-2. Add the attribute `data-filter-bar` = `advisors`.
+2. Add the attribute `data-filter-bar` = `team`.
 3. Add the attribute `data-filter-options` = `true`. This tells the script the filters live directly inside the bar.
 4. Optional: add `data-filter-label` = `Filter advisors by state`. Screen readers announce this as the name of the filter group.
 5. Style it:
@@ -206,7 +206,7 @@ Both can go anywhere on the page. Inside `filter-wrapper`, under the bar, is a g
 
 **The count**
 1. Add a **Text Block** with the class `filter-status`. Leave its text empty, or type a placeholder. The script replaces it.
-2. Add `data-filter-status` = `advisors`.
+2. Add `data-filter-status` = `team`.
 3. Add `data-filter-noun` = `advisor`. It shows as "13 advisors in Indiana."
 4. Optional: add `data-filter-noun-plural` if the plural isn't the noun plus "s," like `people` for `person`.
 5. Optional: change the wording with `data-filter-status-template`. Without it, the count reads like "11 advisors," "13 advisors in Kentucky" or "1 advisor in Kentucky matching “rosa”."
@@ -237,7 +237,7 @@ The count is built from a template. Write it in `data-filter-status-template` on
 
 **The empty message**
 1. Add a **Text Block** (or any element) with the class `filter-empty`. Type what people see when nothing matches, like "No advisors match. Try a different name, city or state."
-2. Add `data-filter-empty` = `advisors`. On the published site it stays hidden from the moment the page loads, and shows only when nothing matches. In the Designer it stays visible, so you can style it.
+2. Add `data-filter-empty` = `team`. On the published site it stays hidden from the moment the page loads, and shows only when nothing matches. In the Designer it stays visible, so you can style it.
 
 ### Step 5: Connect your items
 
@@ -249,7 +249,7 @@ Your Collection List, grid and cards stay exactly as you design them. You only a
 
 **Each item**
 1. Select the **Collection Item** (the grid's direct child, not the card inside it).
-2. Add `data-filter-item` = `advisors`. The script hides and shows this element.
+2. Add `data-filter-item` = `team`. The script hides and shows this element.
 
 **The states each advisor belongs to**
 1. Inside the Collection Item, add a **Collection List** and set its source to the advisor's **States** field (the multi-reference).
@@ -287,7 +287,7 @@ The bar filters every item first, then shows one page of the matches. A filter o
 **Use this instead of Webflow's own pagination.** Webflow's "Paginate items" sends only one page of cards to the browser, so the filter could only see those. Keep every item on the page: turn pagination off on the Collection List (up to 100 items), or use [Finsweet List Load](#more-than-100-items-finsweet-list-load) past 100.
 
 1. Below your grid, add a **Div Block** for the pager. Give it the class `pager`, and lay it out as you like, for example Display Flex, centered, 8px gap.
-2. Add `data-filter-pagination` = `advisors` and `data-filter-page-size` = `12`.
+2. Add `data-filter-pagination` = `team` and `data-filter-page-size` = `12`.
 3. Inside the pager, add a **Button** with the text "Previous" (the **Button** element from the Add panel's Basic section, not a form's Submit button) and the class `pager-step`. Add `data-filter-prev` = `true`.
 4. After it, add a **Div Block** with the class `pager-pages` for the page numbers. Add `data-filter-pages` = `true`.
 5. Inside `pager-pages`, add one **Button** with the text **1** and the class `pager-page`. Add `data-filter-page` = `true`. Every page number is copied from it. If you use a Link Block with a Text Block inside instead, put `data-filter-page-label` = `true` on the Text Block, so the script knows where to write each number.
@@ -304,7 +304,7 @@ To use other names, add `data-filter-current-class` or `data-filter-disabled-cla
 
 **Also good to know**
 - The pager hides itself when everything fits on one page.
-- Optional: a Text Block with `data-filter-range` = `advisors` shows "Showing 13 to 24 of 100." To word it differently, add `data-filter-range-template` with `{from}`, `{to}` and `{total}`, like `{from}-{to} of {total} advisors`.
+- Optional: a Text Block with `data-filter-range` = `team` shows "Showing 13 to 24 of 100." To word it differently, add `data-filter-range-template` with `{from}`, `{to}` and `{total}`, like `{from}-{to} of {total} advisors`.
 - Changing pages scrolls back to the bar when it's above the screen. If you have a sticky header, give the bar a top **scroll margin** so the header doesn't cover it.
 
 ### Step 7: Optional settings on the bar
@@ -372,7 +372,7 @@ One Component can filter advisors on one page, events on another, and articles s
 
 ### How instances stay separate
 
-Every instance has a **group name**, like `advisors`, `events` or `articles`. The script only connects pieces that share a group name:
+Every instance has a **group name**, like `team`, `events` or `articles`. The script only connects pieces that share a group name:
 
 | Piece | Attribute that carries the group name |
 |---|---|
@@ -389,13 +389,22 @@ So a bar named `events` only filters items tagged `data-filter-item` = `events`,
 - They must match exactly, including capitalization. `Events` and `events` won't connect.
 - Two instances on the same page need different names.
 - Use lowercase words with no spaces, like `events` or `case-studies`.
+- The group name is never shown on the page. The word in the count comes from `data-filter-noun`, so a group named `team` can still read "11 advisors."
+
+**Renaming a group**
+
+Change it everywhere it appears, or the pieces quietly disconnect. With the Component's **Group** property, the bar, count and empty message update together. These sit outside the Component, so change them by hand:
+- `data-filter-item` on the **Collection Item** (select the Collection Item once; every item shares it)
+- `data-filter-pagination` and `data-filter-range`, if the pager or range text is outside the Component
+
+If the Collection Item still has the old name, only "All" shows and the count reads 0. If the pager still has it, the pager stops responding. The values on your items (`data-filter-value`, `data-filter-search-text` and the rest) don't carry the group name, so they stay the same.
 
 ### Set up the Component's properties (once)
 
 Instead of typing the group name into each attribute, connect those attributes to Component properties. Then each instance gets its own values. Webflow lets you connect a custom attribute's value to a Component property ([component properties](https://help.webflow.com/lesson/component-properties), [custom attributes](https://help.webflow.com/hc/en-us/articles/33961389460115), [dynamic attributes for components](https://webflow.com/updates/dynamic-attributes-for-components)).
 
 1. Double-click the Component (or choose **Edit component**) to edit its contents.
-2. **Group:** select the bar. In **Element settings**, find the `data-filter-bar` attribute. Instead of typing a value, use the value field's option to **connect it to a property**, create a new **Text** property named **Group**, and give it the default `advisors`.
+2. **Group:** select the bar. In **Element settings**, find the `data-filter-bar` attribute. Instead of typing a value, use the value field's option to **connect it to a property**, create a new **Text** property named **Group**, and give it the default `team`.
 3. Connect the same **Group** property to:
    - `data-filter-status` on the count text
    - `data-filter-empty` on the empty message
@@ -454,7 +463,7 @@ Nothing extra is needed beyond different group names. The script runs once and h
 
 To filter one list two ways, like advisors by state and by service, use two bars with the **same** group name and a different **field** each. Items show only when they match both bars.
 
-1. Build two bars (or place the Component twice) with the same group name, like `advisors`.
+1. Build two bars (or place the Component twice) with the same group name, like `team`.
 2. On the first bar, add `data-filter-field` = `state`. On the second, add `data-filter-field` = `service`.
 3. On each Collection Item, tag both kinds of values:
    - state names with `data-filter-value` = `state` (not `true`)

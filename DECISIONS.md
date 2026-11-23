@@ -45,6 +45,7 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 ## Content and data
 
 - **Your Advisors collection has:** a Home office reference, a Secondary offices multi-reference, and a States multi-reference.
+- **The advisors filter uses the group name `team`** (changed from `advisors`). The count still reads "advisors," because that word comes from `data-filter-noun` = `advisor`. (November 23, 2026)
 - **Filters come from the states your advisors actually have**, not from the States collection, because that collection lists all 50 states.
 - **Use full state names for now** ("Indiana"). You'll switch to two-letter codes ("IN") only if the list grows too long.
 - **Screen readers get the full name** when a short code is used. `data-filter-name` supports this, ready for later.
