@@ -76,10 +76,15 @@
     box.setAttribute('aria-label', bar.dataset.filterLabel || 'Filter');
     thumb.setAttribute('aria-hidden', 'true');
     template.dataset.filterOptionValue = '';
-    // No search field (for example, hidden by a Component visibility property): add the spread combo class,
-    // so one Component works with and without search. Every option is copied from "All", so they all get it.
-    if (!search) template.classList.add(bar.dataset.filterSpreadClass || 'is-spread');
     let slots = [template], active = 0, anim = null, drag = null, suppressClick = false;
+    // No visible search field (left off the page, or hidden with Display: None, at any breakpoint): the filters get
+    // the spread combo class, so one Component works with and without search. Checked again whenever the layout
+    // changes, so a search field hidden at only some breakpoints spreads the filters only there.
+    const spreadClass = bar.dataset.filterSpreadClass || 'is-spread';
+    const setSpread = () => {
+      const on = !search || search.getClientRects().length === 0;
+      [...slots, ...thumb.children].forEach(el => el.classList.toggle(spreadClass, on));
+    };
     const fullName = new Map();   // value text -> full name from data-filter-name
     const value = () => slots[active].dataset.filterOptionValue;
 
@@ -114,6 +119,7 @@
     };
     const place = () => {
       anim?.cancel();
+      setSpread();   // before measuring, since spreading changes every option's width
       [...thumb.children].forEach((c, i) => {
         const [l, r, t, b] = rect(i);
         Object.assign(c.style, { left: `${l}px`, top: `${t}px`, width: `${r - l}px`, height: `${b - t}px` });

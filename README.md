@@ -160,10 +160,10 @@ Leave the Button's link as it is. The script stops it from jumping the page.
 
 If you use a **Link Block** with a Text Block inside instead of a Button, put `data-filter-option-label` = `true` on the Text Block, so the script knows where to write each state's name.
 
-**For a bar without a search field:** the script adds the combo class `is-spread` to the "All" option (and so to every filter) whenever the bar has no search field. Style it once so the filters share the bar's width evenly:
+**For a bar without a visible search field:** the script adds the combo class `is-spread` to every filter whenever the bar's search field isn't showing. That covers a search field left off the page, hidden with a visibility toggle, or hidden with a class set to **Display: None**, including at only some breakpoints. The script checks again whenever the layout changes, so if search is hidden only on Tablet, the filters spread only on Tablet. You never add `is-spread` yourself. Style it once so the filters share the bar's width evenly:
 1. Select the "All" option, type `is-spread` in the selector to add it as a combo class.
 2. Set its **Flex Child** to Grow `1` on Desktop, and back to Don't shrink or grow on Mobile portrait.
-3. Remove `is-spread` from the "All" option again if this bar has a search field. The script adds it only where it's needed.
+3. Remove `is-spread` from the "All" option again. The script adds and removes it as needed.
 
 Like `is-current`, no element may carry `is-spread` in the Designer, so Webflow's **Clean up** would delete it. Skip Clean up for it, or keep a hidden style-guide element that uses it.
 
@@ -318,7 +318,7 @@ Add these to the bar element (`filter-bar`) as custom attributes:
 | `data-filter-squash` | How far the thumb overshoots before settling, in px. `0` gives a plain slide. | `3` |
 | `data-filter-card-motion` = `off` | Turns off the cards' scale-up and glide for this bar | On |
 | `data-filter-field` | A field name, like `state`, for [two bars on one list](#two-bars-on-one-list) | All `data-filter-value` text |
-| `data-filter-spread-class` | The class added to the filters when the bar has no search field | `is-spread` |
+| `data-filter-spread-class` | The class added to the filters when the bar's search field isn't showing | `is-spread` |
 
 #### Card motion
 
@@ -412,11 +412,11 @@ Instead of typing the group name into each attribute, connect those attributes t
 4. **Noun:** select the count text. Connect `data-filter-noun` to a new **Text** property named **Noun**, default `advisor`. If some collections need an unusual plural, also connect `data-filter-noun-plural` to a property named **Noun plural**.
 5. **Count template:** on the count text, connect `data-filter-status-template` to a new **Text** property named **Count template**. Leave it empty for the default wording, or type a template per instance, like `{count}[ {filter}] {noun}` for "6 Retirement articles." See [Count wording](#step-4-count-and-empty-message-optional).
 6. **Label:** select the bar. Connect `data-filter-label` to a new **Text** property named **Label**, default `Filter advisors by state`.
-7. **Show search:** select the search Form Block. In **Element settings**, connect its **Visibility** to a new **Visibility** property named **Show search**, default on.
+7. **Show search:** select the search Form Block. In **Element settings**, connect its **Visibility** to a new **Visibility** property named **Show search**, default on. (Hiding it with a class set to Display: None works too. The script treats a search field that isn't showing the same as one that isn't there.)
 8. **Empty message text:** select the empty message's text and connect it to a new **Text** property named **Empty message**, so each collection can say something fitting, like "No events match."
 9. Optional: connect `data-filter-sort` on the bar to a **Text** property named **Sort**. Leave it empty for A to Z, or type `cms` on an instance to keep CMS order.
 
-**A bar without search spreads its filters on its own.** When an instance has **Show search** off, the script adds the `is-spread` combo class to its "All" option (and so to every filter), and the filters share the bar's width evenly. You style `is-spread` once (see [2c](#2c-the-all-option)). To use a different class name, add `data-filter-spread-class` to the bar.
+**A bar without search spreads its filters on its own.** When an instance has **Show search** off, or its search field is hidden with Display: None, the script adds the `is-spread` combo class to its "All" option (and so to every filter), and the filters share the bar's width evenly. You style `is-spread` once (see [2c](#2c-the-all-option)). To use a different class name, add `data-filter-spread-class` to the bar.
 
 ### Add an instance for another collection
 
