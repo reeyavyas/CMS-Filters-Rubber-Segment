@@ -77,12 +77,15 @@
     thumb.setAttribute('aria-hidden', 'true');
     template.dataset.filterOptionValue = '';
     let slots = [template], active = 0, anim = null, drag = null, suppressClick = false;
-    // No visible search field (left off the page, or hidden with Display: None, at any breakpoint): the filters get
-    // the spread combo class, so one Component works with and without search. Checked again whenever the layout
-    // changes, so a search field hidden at only some breakpoints spreads the filters only there.
+    // No visible search field (left off the page, or hidden with Display: None, at any breakpoint) and every filter on
+    // one line: the filters get the spread combo class, so one Component works with and without search. Once the
+    // filters wrap, they keep their natural width, so a short last line is never stretched across the bar. (Spreading
+    // doesn't change where lines break, so this can't flip back and forth.) Checked again whenever the layout changes.
     const spreadClass = bar.dataset.filterSpreadClass || 'is-spread';
     const setSpread = () => {
-      const on = !search || search.getClientRects().length === 0;
+      const noSearch = !search || search.getClientRects().length === 0;
+      const oneLine = new Set(slots.map(s => Math.round(s.getBoundingClientRect().top))).size === 1;
+      const on = noSearch && oneLine;
       [...slots, ...thumb.children].forEach(el => el.classList.toggle(spreadClass, on));
     };
     const fullName = new Map();   // value text -> full name from data-filter-name

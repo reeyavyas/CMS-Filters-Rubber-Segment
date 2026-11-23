@@ -160,7 +160,7 @@ Leave the Button's link as it is. The script stops it from jumping the page.
 
 If you use a **Link Block** with a Text Block inside instead of a Button, put `data-filter-option-label` = `true` on the Text Block, so the script knows where to write each state's name.
 
-**For a bar without a visible search field:** the script adds the combo class `is-spread` to every filter whenever the bar's search field isn't showing. That covers a search field left off the page, hidden with a visibility toggle, or hidden with a class set to **Display: None**, including at only some breakpoints. The script checks again whenever the layout changes, so if search is hidden only on Tablet, the filters spread only on Tablet. You never add `is-spread` yourself. Style it once so the filters share the bar's width evenly:
+**For a bar without a visible search field:** the script adds the combo class `is-spread` to every filter whenever the bar's search field isn't showing. That covers a search field left off the page, hidden with a visibility toggle, or hidden with a class set to **Display: None**, including at only some breakpoints. The script checks again whenever the layout changes, so if search is hidden only on Tablet, the filters spread only on Tablet. You never add `is-spread` yourself. Spreading also needs **every filter on one line**. Once the filters wrap, they keep their natural width and the next line starts at the left, so a short last line (like Tennessee on its own) is never stretched across the bar. Style it once so the filters share the bar's width evenly:
 1. Select the "All" option, type `is-spread` in the selector to add it as a combo class.
 2. Set its **Flex Child** to Grow `1` on Desktop, and back to Don't shrink or grow on Mobile portrait.
 3. Remove `is-spread` from the "All" option again. The script adds and removes it as needed.
@@ -318,7 +318,7 @@ Add these to the bar element (`filter-bar`) as custom attributes:
 | `data-filter-squash` | How far the thumb overshoots before settling, in px. `0` gives a plain slide. | `3` |
 | `data-filter-card-motion` = `off` | Turns off the cards' scale-up and glide for this bar | On |
 | `data-filter-field` | A field name, like `state`, for [two bars on one list](#two-bars-on-one-list) | All `data-filter-value` text |
-| `data-filter-spread-class` | The class added to the filters when the bar's search field isn't showing | `is-spread` |
+| `data-filter-spread-class` | The class added to the filters when the bar's search field isn't showing and every filter fits on one line | `is-spread` |
 
 #### Card motion
 

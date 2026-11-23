@@ -29,7 +29,7 @@ The design and build decisions made for this filter bar, from November 17 to 20,
 - **Padding:** 8px top and bottom. Side padding is 48px on desktop, 24px on tablet and 4px on phones.
   - Earlier: 16px, then 24px on desktop. You asked for more padding to cut down empty space in the bar.
 - **Filters keep their natural width**, so a short last line (like "Tennessee" alone) doesn't stretch across the bar.
-- **A bar without search spreads its filters evenly** across the bar. The script adds the `is-spread` class for this automatically, whether the search field is left off the page or hidden with Display: None (which is how you hide it), at any breakpoint. (Updated November 23, 2026)
+- **A bar without search spreads its filters evenly** across the bar. The script adds the `is-spread` class for this automatically, whether the search field is left off the page or hidden with Display: None (which is how you hide it), at any breakpoint. Spreading only applies while every filter fits on one line. Once they wrap, filters keep their natural width, so a short last line is never stretched. (Updated November 23, 2026)
 - **It's fine for filters to wrap** once there are 5 or more states.
 
 ### The bar
